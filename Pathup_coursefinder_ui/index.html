@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Course Finder | Filters & Sorting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0d1321;
+      --ink-2: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #0f766e;
+      --accent-2: #f59e0b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --shadow: 0 20px 60px rgba(13, 19, 33, 0.12);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 800px at 10% -10%, #d1fae5 0%, transparent 60%),
+                  radial-gradient(900px 700px at 110% 10%, #fef3c7 0%, transparent 60%),
+                  var(--bg);
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 32px auto 64px;
+      padding: 0 20px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 24px;
+      align-items: center;
+      padding: 28px;
+      border-radius: 24px;
+      background: linear-gradient(120deg, #0f766e 0%, #134e4a 70%);
+      color: #f8fafc;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      font-family: Fraunces, serif;
+      font-size: clamp(28px, 2.6vw, 44px);
+      margin: 0 0 10px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #d1fae5;
+      line-height: 1.6;
+    }
+
+    .hero .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero .stat {
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .hero .stat strong {
+      display: block;
+      font-size: 18px;
+      letter-spacing: normal;
+      margin-top: 6px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 22px;
+      margin-top: 26px;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(15, 118, 110, 0.08);
+    }
+
+    .filters {
+      padding: 18px;
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .filters h2 {
+      font-family: Fraunces, serif;
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .section {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .section h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .section.is-hidden {
+      display: none;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #4e4f50;
+    }
+
+    .selected-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 2px;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 118, 110, 0.2);
+      background: rgba(15, 118, 110, 0.08);
+      color: var(--ink-2);
+      font-size: 12px;
+    }
+
+    .filter-chip button {
+      border: none;
+      background: transparent;
+      color: var(--ink-2);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 2px;
+    }
+
+    .filter-chip button:hover {
+      color: var(--accent);
+    }
+
+    .checkbox, .radio {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 8px 0;
+      font-size: 13px;
+      color: var(--ink-2);
+    }
+
+    input[type="checkbox"], input[type="radio"] {
+      accent-color: var(--accent);
+      margin-top: 3px;
+    }
+
+    .checklist {
+      max-height: 180px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .checklist::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .checklist::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 999px;
+    }
+
+    .range {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .range input {
+      width: 100%;
+    }
+
+    .select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--ink-2);
+      background: #fff;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn.ghost {
+      background: #f1f5f9;
+      color: var(--ink-2);
+    }
+
+    .results {
+      padding: 18px 18px 6px;
+    }
+
+    .results-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      position: sticky;
+      top: 12px;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(15, 118, 110, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .results-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-family: Fraunces, serif;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .sort {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sort .select {
+      width: 220px;
+    }
+
+    .sort .toggle {
+      display: flex;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .sort .toggle button {
+      padding: 8px 10px;
+      border: none;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .sort .toggle button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .cards {
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(15, 118, 110, 0.12);
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 8px 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      font-size: 12px;
+      color: var(--ink-2);
+    }
+
+    .badge {
+      background: #ecfeff;
+      color: #155e75;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .score {
+      text-align: right;
+      min-width: 120px;
+    }
+
+    .score strong {
+      display: block;
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    .score span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .cta {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .cta button {
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .cta button.primary {
+      background: var(--accent-2);
+      border-color: transparent;
+      color: #1f2937;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 14px 0 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pagination button {
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .filters { position: relative; }
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        grid-template-columns: 1fr;
+      }
+      .score {
+        text-align: left;
+      }
+      .sort {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .sort .select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1>Find the right course with smart filters</h1>
+        <p>Compare colleges, fees, placements, and admissions with a professional-grade sorting experience. Inspired by leading education platforms, refined for modern clarity.</p>
+        <div class="stats">
+          <div class="stat">Courses<strong>1,240+</strong></div>
+          <div class="stat">Colleges<strong>310+</strong></div>
+          <div class="stat">Scholarships<strong>85+</strong></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel" style="padding: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+          <h3 style="margin: 0 0 8px; font-family: Fraunces, serif;">Quick Search</h3>
+          <input class="select" style="margin-bottom: 10px;" type="text" placeholder="Search by course, college, or city" />
+          <div class="chips">
+            <span class="chip">B.Tech</span>
+            <span class="chip">BCA</span>
+            <span class="chip">BBA</span>
+            <span class="chip">Medical</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel filters">
+        <h2>Filters</h2>
+        <p style="margin: 0; color: var(--muted); font-size: 12px;">Refine results with multi-criteria controls.</p>
+
+        <div class="section">
+          <h3>Sort By</h3>
+          <select class="select filter-input" data-filter="sort">
+            <option>Relevance (Default)</option>
+            <option>Highest Placement</option>
+            <option>Lowest Fees</option>
+            <option>Highest Rating</option>
+            <option>Best ROI</option>
+            <option>Newest Courses</option>
+          </select>
+        </div>
+
+        <div class="section">
+          <h3>Course Name</h3>
+          <input class="select filter-input" id="course-search" type="text" placeholder="Search course name (e.g., B.Tech CSE)" />
+          <div class="sort" style="margin-top: 10px;">
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Order</div>
+              <div class="toggle">
+                <button class="active" type="button">A ? Z</button>
+                <button type="button">Z ? A</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Courses List</h3>
+          <div class="checklist">
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Tech (CSE)"> B.Tech (CSE)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Tech (ECE)"> B.Tech (ECE)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Tech (Mechanical)"> B.Tech (Mechanical)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Tech (Civil)"> B.Tech (Civil)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="MBA (Finance)"> MBA (Finance)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="MBA (Marketing)"> MBA (Marketing)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="MBA (Operations)"> MBA (Operations)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Des (Interaction)"> B.Des (Interaction)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Des (Graphic)"> B.Des (Graphic)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Sc (Data Science)"> B.Sc (Data Science)</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="BCA"> BCA</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="MCA"> MCA</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Pharm"> B.Pharm</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="M.Pharm"> M.Pharm</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="MBBS"> MBBS</label>
+            <label class="checkbox"><input class="filter-input" data-filter="course" type="checkbox" value="B.Arch"> B.Arch</label>
+          </div>
+        </div>
+
+        <div class="section is-hidden" id="bca-specialization">
+          <h3>BCA Specialization (Optional)</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="specialization" data-parent="BCA" type="checkbox" value="Data Science"> Data Science</label>
+          <label class="checkbox"><input class="filter-input" data-filter="specialization" data-parent="BCA" type="checkbox" value="Cyber Security"> Cyber Security</label>
+          <label class="checkbox"><input class="filter-input" data-filter="specialization" data-parent="BCA" type="checkbox" value="Cloud Computing"> Cloud Computing</label>
+          <label class="checkbox"><input class="filter-input" data-filter="specialization" data-parent="BCA" type="checkbox" value="Full Stack"> Full Stack</label>
+          <label class="checkbox"><input class="filter-input" data-filter="specialization" data-parent="BCA" type="checkbox" value="AI & ML"> AI & ML</label>
+        </div>
+
+        <div class="section">
+          <h3>Course Level</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="level" type="checkbox" value="UG" checked> UG (Undergraduate)</label>
+          <label class="checkbox"><input class="filter-input" data-filter="level" type="checkbox" value="PG" checked> PG (Postgraduate)</label>
+          <label class="checkbox"><input class="filter-input" data-filter="level" type="checkbox" value="Diploma"> Diploma</label>
+          <label class="checkbox"><input class="filter-input" data-filter="level" type="checkbox" value="Doctorate"> Doctorate</label>
+        </div>
+
+        <div class="section">
+          <h3>Mode</h3>
+          <label class="radio"><input class="filter-input" data-filter="mode" name="mode" type="radio" value="Full-Time" checked> Full-Time</label>
+          <label class="radio"><input class="filter-input" data-filter="mode" name="mode" type="radio" value="Part-Time"> Part-Time</label>
+          <label class="radio"><input class="filter-input" data-filter="mode" name="mode" type="radio" value="Online"> Online</label>
+        </div>
+
+        <div class="section">
+          <h3>Fees Range (INR)</h3>
+          <div class="range"><span>0</span><input class="filter-input" data-filter="fees" type="range" min="0" max="800000" value="800000"><span>8L+</span></div>
+        </div>
+
+        <div class="section">
+          <h3>Entrance Exam</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="exam" type="checkbox" value="JEE Main"> JEE Main</label>
+          <label class="checkbox"><input class="filter-input" data-filter="exam" type="checkbox" value="CAT"> CAT</label>
+          <label class="checkbox"><input class="filter-input" data-filter="exam" type="checkbox" value="NEET"> NEET</label>
+          <label class="checkbox"><input class="filter-input" data-filter="exam" type="checkbox" value="GATE"> GATE</label>
+        </div>
+
+        <div class="section">
+          <h3>Location</h3>
+          <select class="select filter-input" data-filter="location">
+            <option>All India</option>
+            <option>Bengaluru</option>
+            <option>Pune</option>
+            <option>Delhi NCR</option>
+            <option>Hyderabad</option>
+          </select>
+        </div>
+
+        <div class="section">
+          <h3>College Type</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="type" type="checkbox" value="Private" checked> Private</label>
+          <label class="checkbox"><input class="filter-input" data-filter="type" type="checkbox" value="Government" checked> Government</label>
+          <label class="checkbox"><input class="filter-input" data-filter="type" type="checkbox" value="Autonomous"> Autonomous</label>
+        </div>
+
+        <div class="section">
+          <h3>Rating</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="rating" type="checkbox" value="4.5"> 4.5+ Stars</label>
+          <label class="checkbox"><input class="filter-input" data-filter="rating" type="checkbox" value="4.0"> 4.0+ Stars</label>
+          <label class="checkbox"><input class="filter-input" data-filter="rating" type="checkbox" value="3.5"> 3.5+ Stars</label>
+        </div>
+
+        <div class="section">
+          <h3>Seats Available</h3>
+          <div class="range"><span>0</span><input class="filter-input" data-filter="seats" type="range" min="0" max="240" value="0"><span>240+</span></div>
+        </div>
+
+        <div class="section">
+          <h3>Placement Package</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="placement" type="checkbox" value="6"> 6 LPA+</label>
+          <label class="checkbox"><input class="filter-input" data-filter="placement" type="checkbox" value="10"> 10 LPA+</label>
+          <label class="checkbox"><input class="filter-input" data-filter="placement" type="checkbox" value="20"> 20 LPA+</label>
+        </div>
+
+        <div class="section">
+          <h3>Campus Facilities</h3>
+          <label class="checkbox"><input class="filter-input" data-filter="facility" type="checkbox" value="Hostel"> Hostel</label>
+          <label class="checkbox"><input class="filter-input" data-filter="facility" type="checkbox" value="Scholarships"> Scholarships</label>
+          <label class="checkbox"><input class="filter-input" data-filter="facility" type="checkbox" value="Sports"> Sports</label>
+          <label class="checkbox"><input class="filter-input" data-filter="facility" type="checkbox" value="Labs"> Labs</label>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="button">Apply Filters</button>
+          <button class="btn ghost" id="reset-filters" type="button">Reset</button>
+        </div>
+      </aside>
+
+      <section class="panel results">
+        <div class="results-header">
+          <div>
+            <h2>Top Matches</h2>
+          <div style="font-size: 12px; color: var(--muted);"><span id="results-count">Showing 3 of 3 results</span></div>
+            <div class="selected-filters" id="selected-filters"></div>
+            <div class="status" id="status-message"></div>
+          </div>
+          <div class="sort">
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Sorting</div>
+              <select class="select">
+                <option>Relevance</option>
+                <option>Fees: Low to High</option>
+                <option>Fees: High to Low</option>
+                <option>Placement: High to Low</option>
+                <option>Rating: High to Low</option>
+                <option>Popularity</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">View</div>
+              <div class="toggle">
+                <button class="active">Card</button>
+                <button>Compact</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cards">
+          <article class="card"
+            data-course="B.Tech (CSE)"
+            data-level="UG"
+            data-mode="Full-Time"
+            data-exam="JEE Main"
+            data-location="Surathkal"
+            data-type="Government"
+            data-rating="4.6"
+            data-fees="180000"
+            data-seats="120"
+            data-placement="19"
+            data-facilities="Hostel,Scholarships,Sports,Labs">
+            <div>
+              <h3>National Institute of Technology, Karnataka</h3>
+              <p>B.Tech in Computer Science � NIRF Top 50 � Accredited by NBA</p>
+              <div class="meta">
+                <span class="badge">B.Tech</span>
+                <span>Surathkal</span>
+                <span>Fees: INR 1.8L / year</span>
+                <span>Placement: 19 LPA avg</span>
+                <span>Rating: 4.6</span>
+              </div>
+              <div class="cta">
+                <button>Compare</button>
+                <button class="primary">Apply Now</button>
+              </div>
+            </div>
+            <div class="score">
+              <strong>94</strong>
+              <span>Match Score</span>
+            </div>
+          </article>
+
+          <article class="card"
+            data-course="MBA (Finance)"
+            data-level="PG"
+            data-mode="Full-Time"
+            data-exam="CAT"
+            data-location="Bengaluru"
+            data-type="Private"
+            data-rating="4.4"
+            data-fees="620000"
+            data-seats="90"
+            data-placement="14"
+            data-facilities="Hostel,Scholarships,Labs">
+            <div>
+              <h3>Institute of Management Excellence</h3>
+              <p>MBA in Finance � Strong industry connect � Scholarships available</p>
+              <div class="meta">
+                <span class="badge">MBA</span>
+                <span>Bengaluru</span>
+                <span>Fees: INR 6.2L / year</span>
+                <span>Placement: 14 LPA avg</span>
+                <span>Rating: 4.4</span>
+              </div>
+              <div class="cta">
+                <button>Compare</button>
+                <button class="primary">Apply Now</button>
+              </div>
+            </div>
+            <div class="score">
+              <strong>90</strong>
+              <span>Match Score</span>
+            </div>
+          </article>
+
+          <article class="card"
+            data-course="B.Des (Interaction)"
+            data-level="UG"
+            data-mode="Full-Time"
+            data-exam="Design Aptitude"
+            data-location="Pune"
+            data-type="Private"
+            data-rating="4.2"
+            data-fees="340000"
+            data-seats="60"
+            data-placement="11"
+            data-facilities="Hostel,Sports,Labs">
+            <div>
+              <h3>Design & Innovation School</h3>
+              <p>B.Des in Interaction Design � Incubation support � Global exchange</p>
+              <div class="meta">
+                <span class="badge">B.Des</span>
+                <span>Pune</span>
+                <span>Fees: INR 3.4L / year</span>
+                <span>Placement: 11 LPA avg</span>
+                <span>Rating: 4.2</span>
+              </div>
+              <div class="cta">
+                <button>Compare</button>
+                <button class="primary">Apply Now</button>
+              </div>
+            </div>
+            <div class="score">
+              <strong>88</strong>
+              <span>Match Score</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="pagination">
+          <span>Page 1 of 52</span>
+          <div style="display: flex; gap: 8px;">
+            <button>Prev</button>
+            <button>Next</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
