@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}PathUp | Career Guidance{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <div>
+        <h2>Career Guidance</h2>
+        <p>Choose a path, see courses, and connect to outcomes.</p>
+      </div>
+      <a class="btn btn-secondary" href="{% url 'tools' %}">Explore Tools</a>
+    </div>
+  </section>
+
+  <section id="career" class="career">
+    <div class="container">
+      <div class="section-head">
+        <h2>Not sure what to choose?</h2>
+        <p>AI-assisted guidance that maps skills to outcomes.</p>
+      </div>
+      <div class="career-grid">
+        <div class="career-card">
+          <h3>Analytical and Math</h3>
+          <div class="path-steps">
+            <div class="path-step"><span>Skills</span><strong>Problem solving, statistics</strong></div>
+            <div class="path-step"><span>Courses</span><strong>B.Tech CSE, B.Sc Data Science</strong></div>
+            <div class="path-step"><span>Colleges</span><strong>Top CSE institutes, data focused universities</strong></div>
+            <div class="path-step"><span>Careers</span><strong>Data Analyst, ML Engineer</strong></div>
+          </div>
+          <a class="btn btn-primary" href="{% url 'finder' %}">Take Career Guidance Test</a>
+        </div>
+        <div class="career-card">
+          <h3>People and Leadership</h3>
+          <div class="path-steps">
+            <div class="path-step"><span>Skills</span><strong>Communication, leadership</strong></div>
+            <div class="path-step"><span>Courses</span><strong>BBA, MBA, Hospital Administration</strong></div>
+            <div class="path-step"><span>Colleges</span><strong>Management schools, healthcare institutes</strong></div>
+            <div class="path-step"><span>Careers</span><strong>Product Manager, Operations Lead</strong></div>
+          </div>
+          <a class="btn btn-primary" href="{% url 'tools' %}">Explore Guidance Tools</a>
+        </div>
+        <div class="career-card">
+          <h3>Creative and Human Sciences</h3>
+          <div class="path-steps">
+            <div class="path-step"><span>Skills</span><strong>Design, empathy, research</strong></div>
+            <div class="path-step"><span>Courses</span><strong>Psychology, Design, Media</strong></div>
+            <div class="path-step"><span>Colleges</span><strong>Liberal arts universities, design schools</strong></div>
+            <div class="path-step"><span>Careers</span><strong>UX Designer, Counsellor</strong></div>
+          </div>
+          <a class="btn btn-primary" href="{% url 'compare' %}">Compare Colleges</a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

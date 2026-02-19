@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}PathUp | Student Tools Hub{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <div>
+        <h2>Student Tools Hub</h2>
+        <p>Focused tools for planning, shortlisting, and readiness.</p>
+      </div>
+      <a class="btn btn-secondary" href="{% url 'finder' %}">Open Finder</a>
+    </div>
+  </section>
+
+  <section id="tools" class="tools">
+    <div class="container">
+      <div class="section-head">
+        <h2>Student Tools Hub</h2>
+        <p>Fast, focused tools for smarter planning.</p>
+      </div>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <h3>College Shortlist</h3>
+          <p>Save and compare your best-fit colleges.</p>
+          <a class="btn btn-secondary" href="{% url 'finder' %}">Build Shortlist</a>
+        </div>
+        <div class="tool-card">
+          <h3>Fee Calculator</h3>
+          <p>Estimate year-wise expenses and scholarships.</p>
+          <button class="btn btn-secondary" type="button">Open Calculator</button>
+        </div>
+        <div class="tool-card">
+          <h3>Cutoff Predictor</h3>
+          <p>Plan safely based on past cutoff trends.</p>
+          <button class="btn btn-secondary" type="button">Check Cutoffs</button>
+        </div>
+        <div class="tool-card">
+          <h3>Exam Calendar</h3>
+          <p>Track important dates and application windows.</p>
+          <button class="btn btn-secondary" type="button">View Calendar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

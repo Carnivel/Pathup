@@ -160,6 +160,9 @@ select {
 }
 
 .chip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--color-border);
   background: white;
   color: var(--color-primary);
@@ -208,6 +211,9 @@ select {
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   padding: 12px 18px;
   border-radius: 12px;

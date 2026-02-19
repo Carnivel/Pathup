@@ -3,534 +3,1891 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PathUp | Find the Right College. Build the Right Future.</title>
-  <meta name="description" content="PathUp helps Indian students compare colleges, courses, fees, cutoffs and career outcomes with clarity and trust.">
-  <meta name="theme-color" content="#1e2a55">
+  <title>PathUp | React College Discovery Platform</title>
+  <meta name="description" content="PathUp helps students compare colleges, fees, cutoffs, and career outcomes with clarity.">
+  <meta name="theme-color" content="#173063">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="home_styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef3fb;
+      --bg-soft: #f6f9f5;
+      --surface: #ffffff;
+      --surface-strong: #f8fbff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --brand: #173063;
+      --brand-2: #0f766e;
+      --accent: #f59e0b;
+      --accent-ink: #3a2500;
+      --line: rgba(15, 23, 42, 0.12);
+      --line-soft: rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 14px 32px rgba(15, 23, 42, 0.12);
+      --shadow-hover: 0 20px 40px rgba(15, 23, 42, 0.18);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --ease: 220ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      background:
+        radial-gradient(1000px 700px at -8% -12%, rgba(23, 48, 99, 0.08), transparent 55%),
+        radial-gradient(900px 700px at 105% -5%, rgba(15, 118, 110, 0.1), transparent 58%),
+        linear-gradient(170deg, var(--bg) 0%, var(--bg-soft) 55%, #ecf3ef 100%);
+      line-height: 1.55;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      font-family: "Sora", sans-serif;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1180px, 92vw);
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(246, 250, 255, 0.86);
+      backdrop-filter: blur(12px);
+    }
+
+    .header-row {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-family: "Sora", sans-serif;
+      color: #f8fafc;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #173063, #2657b0);
+      box-shadow: 0 8px 18px rgba(23, 48, 99, 0.36);
+    }
+
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-name {
+      color: var(--brand);
+      font-weight: 700;
+      font-size: 21px;
+    }
+
+    .brand-sub {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .top-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--brand);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--ease), color var(--ease), border-color var(--ease);
+    }
+
+    .nav-btn:hover {
+      background: rgba(23, 48, 99, 0.08);
+      border-color: rgba(23, 48, 99, 0.12);
+    }
+
+    .nav-btn.active {
+      color: #ffffff;
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--brand), #2657b0);
+    }
+
+    .header-cta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      color: var(--accent-ink);
+      background: linear-gradient(135deg, #f8b424, var(--accent));
+      box-shadow: 0 10px 20px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-secondary {
+      color: #ffffff;
+      background: linear-gradient(130deg, #0f766e, #0a9388);
+      box-shadow: 0 10px 20px rgba(15, 118, 110, 0.22);
+    }
+
+    .btn-ghost {
+      color: var(--brand);
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    main {
+      padding-bottom: 80px;
+    }
+
+    .hero {
+      padding: 68px 0 42px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+
+    .hero::before {
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, rgba(38, 87, 176, 0.24), transparent 68%);
+      top: -160px;
+      right: -80px;
+    }
+
+    .hero::after {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(15, 118, 110, 0.22), transparent 66%);
+      bottom: -130px;
+      left: -70px;
+    }
+
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #075f59;
+      background: rgba(15, 118, 110, 0.15);
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(32px, 5vw, 54px);
+      color: var(--brand);
+      max-width: 12ch;
+    }
+
+    .hero-sub {
+      max-width: 52ch;
+      font-size: 17px;
+      color: #334155;
+    }
+
+    .hero-panel {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line-soft);
+      box-shadow: var(--shadow-soft);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-panel h3 {
+      color: var(--brand);
+      font-size: 20px;
+    }
+
+    .hero-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .hero-list li {
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .hero-list li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(145deg, #0f766e, #0a9388);
+      flex-shrink: 0;
+    }
+
+    .hero-form {
+      margin-top: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line-soft);
+      box-shadow: var(--shadow-soft);
+      border-radius: 20px;
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.15fr 0.7fr 0.75fr auto;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .field input,
+    .field select {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      background: #f8fbff;
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: var(--ink);
+      transition: border-color var(--ease), box-shadow var(--ease);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: rgba(38, 87, 176, 0.45);
+      box-shadow: 0 0 0 3px rgba(38, 87, 176, 0.12);
+    }
+
+    .stats {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 14px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .stat strong {
+      font-family: "Sora", sans-serif;
+      color: var(--brand);
+      font-size: 22px;
+    }
+
+    .stat span {
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .section {
+      padding: 64px 0 24px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+      color: var(--brand);
+      font-size: clamp(26px, 3vw, 36px);
+    }
+
+    .section-head p {
+      max-width: 62ch;
+    }
+
+    .quick-streams {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--brand);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .chip:hover {
+      transform: translateY(-2px);
+      border-color: rgba(23, 48, 99, 0.22);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .finder-wrap {
+      border: 1px solid var(--line-soft);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 255, 0.9));
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+    }
+
+    .finder-grid {
+      display: grid;
+      grid-template-columns: minmax(250px, 320px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .filters {
+      position: sticky;
+      top: 94px;
+      border-radius: 18px;
+      border: 1px solid var(--line-soft);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .filters h3 {
+      color: var(--brand);
+      font-size: 19px;
+    }
+
+    .filter-row {
+      display: grid;
+      gap: 6px;
+    }
+
+    .filter-row label {
+      font-weight: 600;
+      color: #334155;
+      font-size: 12px;
+    }
+
+    .filter-row input,
+    .filter-row select {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      background: #f8fbff;
+    }
+
+    .slider-note {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .panel-list {
+      margin: 4px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+
+    .panel-list li {
+      font-size: 13px;
+      color: #334155;
+      border-radius: 10px;
+      background: #f8fbff;
+      border: 1px solid var(--line-soft);
+      padding: 8px 10px;
+    }
+
+    .results {
+      display: grid;
+      gap: 14px;
+    }
+
+    .results-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .results-count {
+      color: #334155;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .college-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border-radius: 16px;
+      border: 1px solid var(--line-soft);
+      background: #ffffff;
+      padding: 16px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      display: grid;
+      gap: 12px;
+      transition: transform var(--ease), box-shadow var(--ease);
+      min-width: 0;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .card h4 {
+      color: #102242;
+      font-size: 18px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .meta {
+      color: #4b5563;
+      font-size: 13px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .badge {
+      flex-shrink: 0;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.13);
+      color: #0e6d66;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 9px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1f2937;
+      background: #f1f5f9;
+      border: 1px solid var(--line-soft);
+      padding: 5px 9px;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fafc;
+      color: #1e293b;
+      font-weight: 600;
+      min-height: 38px;
+      padding: 0 10px;
+      cursor: pointer;
+      transition: background var(--ease), border-color var(--ease), color var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+      min-width: 0;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-btn.active {
+      border-color: rgba(245, 158, 11, 0.55);
+      background: rgba(245, 158, 11, 0.16);
+      color: #7c4700;
+    }
+
+    .empty {
+      border-radius: 14px;
+      border: 1px dashed rgba(15, 23, 42, 0.18);
+      background: rgba(255, 255, 255, 0.75);
+      padding: 24px;
+      text-align: center;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .compare-wrap {
+      border-radius: 20px;
+      border: 1px solid var(--line-soft);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow-soft);
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      padding: 14px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: left;
+      font-size: 14px;
+      color: #1f2937;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    th {
+      background: #f8fbff;
+      color: #102242;
+      font-weight: 700;
+    }
+
+    .guidance-grid,
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .panel-card {
+      border-radius: 16px;
+      border: 1px solid var(--line-soft);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: var(--shadow-soft);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .panel-card h3 {
+      color: #102242;
+      font-size: 18px;
+    }
+
+    .panel-card p {
+      color: #475569;
+      font-size: 14px;
+    }
+
+    .insight-bar {
+      margin-top: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line-soft);
+      background: linear-gradient(140deg, #102242, #1e3a74 60%, #145f5a);
+      color: #e7efff;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .insight-bar h4 {
+      color: #ffffff;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .insight-bar p {
+      color: rgba(231, 239, 255, 0.86);
+      font-size: 13px;
+    }
+
+    .site-footer {
+      margin-top: 60px;
+      padding: 26px 0 34px;
+      border-top: 1px solid var(--line-soft);
+      background: rgba(15, 23, 42, 0.95);
+      color: #d8e1f7;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 18px;
+    }
+
+    .footer-title {
+      color: #f8fbff;
+      font-family: "Sora", sans-serif;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .footer-col {
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+      color: #c2d0f5;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 120;
+      background: #102242;
+      color: #ffffff;
+      border-radius: 10px;
+      box-shadow: var(--shadow-hover);
+      padding: 10px 14px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity var(--ease), transform var(--ease);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .loading {
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--line-soft);
+      padding: 24px;
+      color: #334155;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .error {
+      border-radius: 14px;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      background: rgba(254, 242, 242, 0.85);
+      color: #9f1239;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-form {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .quick-streams {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .insight-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .finder-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .header-row {
+        justify-content: center;
+      }
+
+      .top-nav {
+        justify-content: center;
+      }
+
+      .header-cta {
+        justify-content: center;
+      }
+
+      .hero {
+        padding-top: 52px;
+      }
+
+      .hero-form {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .card-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding-top: 52px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header" id="top">
-    <div class="container header-inner">
-      <div class="brand">
-        <div class="logo-mark">P</div>
-        <div class="brand-text">
-          <span class="brand-name">PathUp</span>
-          <span class="brand-tag">College discovery with clarity</span>
-        </div>
-      </div>
-      <nav class="nav">
-        <a href="#/home" data-route="home">Home</a>
-        <a href="#/finder" data-route="finder">College Finder</a>
-        <a href="#/career" data-route="career">Career Guidance</a>
-        <a href="#/compare" data-route="compare">Compare</a>
-        <a href="#/tools" data-route="tools">Student Tools</a>
-      </nav>
-      <div class="header-cta">
-        <button class="btn btn-ghost" data-route="career">Take Career Quiz</button>
-        <button class="btn btn-primary" data-route="finder">Explore Colleges</button>
-      </div>
-    </div>
-  </header>
+  <div id="root"></div>
 
-  <div class="page-indicator">
-    <div class="container page-indicator-inner">
-      <span class="page-label">You are in</span>
-      <strong id="pageIndicator">Home</strong>
-      <div class="page-actions">
-        <button class="chip-btn" data-route="home">Overview</button>
-        <button class="chip-btn" data-route="finder">Finder</button>
-        <button class="chip-btn" data-route="career">Guidance</button>
-        <button class="chip-btn" data-route="compare">Compare</button>
-        <button class="chip-btn" data-route="tools">Tools</button>
-      </div>
-    </div>
-  </div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <main id="main">
-    <section class="page page-home active" data-page="home">
-      <section class="hero">
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow">Trusted college guidance for Class 10-12 and UG aspirants</p>
-            <h1>Find the Right College. Build the Right Future.</h1>
-            <p class="subtext">Compare colleges, courses, fees, specializations and career outcomes with calm, data-driven guidance.</p>
-            <form id="heroSearch" class="hero-search" aria-label="Smart search">
-              <div class="input-group">
-                <label for="heroQuery">Course, College or Career</label>
-                <input id="heroQuery" type="text" placeholder="Example: B.Tech, MBBS, Data Science" autocomplete="off">
+  <script type="text/babel">
+    const { useEffect, useMemo, useState } = React;
+
+    const API_ENDPOINTS = [
+      "../../back_end/courses.php?api=1",
+      "/Pathup/back_end/courses.php?api=1",
+      "../../pathup_api/courses.php",
+      "/Pathup/pathup_api/courses.php",
+      "home_data.json"
+    ];
+
+    const FALLBACK_COLLEGES = [
+      {
+        id: "c-1",
+        college_name: "PathUp Institute of Technology",
+        course: "Engineering",
+        specialisation: "Computer Science",
+        location: "Bengaluru Urban",
+        fees: 245000,
+        exam: "KCET, COMEDK",
+        rating: 4.6,
+        approval: "AICTE",
+        university: "VTU",
+        ownership: "Private"
+      },
+      {
+        id: "c-2",
+        college_name: "South Valley School of Nursing",
+        course: "Nursing",
+        specialisation: "B.Sc Nursing",
+        location: "Mysuru",
+        fees: 162000,
+        exam: "State Nursing Entrance",
+        rating: 4.2,
+        approval: "INC",
+        university: "Rajiv Gandhi Health University",
+        ownership: "Private"
+      },
+      {
+        id: "c-3",
+        college_name: "Karnataka Public Engineering College",
+        course: "Engineering",
+        specialisation: "Mechanical Engineering",
+        location: "Dharwad",
+        fees: 96000,
+        exam: "KCET",
+        rating: 4.1,
+        approval: "AICTE",
+        university: "VTU",
+        ownership: "Government"
+      },
+      {
+        id: "c-4",
+        college_name: "Metro School of Business",
+        course: "Management",
+        specialisation: "BBA",
+        location: "Bengaluru Rural",
+        fees: 210000,
+        exam: "CUET",
+        rating: 4.3,
+        approval: "UGC",
+        university: "Bangalore North University",
+        ownership: "Private"
+      },
+      {
+        id: "c-5",
+        college_name: "Riverfront College of Computer Applications",
+        course: "BCA",
+        specialisation: "Data Analytics",
+        location: "Udupi",
+        fees: 128000,
+        exam: "CUET",
+        rating: 4.4,
+        approval: "UGC",
+        university: "Mangalore University",
+        ownership: "Private"
+      },
+      {
+        id: "c-6",
+        college_name: "Stellar Medical Sciences College",
+        course: "Medicine",
+        specialisation: "MBBS",
+        location: "Tumakuru",
+        fees: 890000,
+        exam: "NEET",
+        rating: 4.5,
+        approval: "NMC",
+        university: "Rajiv Gandhi Health University",
+        ownership: "Deemed"
+      },
+      {
+        id: "c-7",
+        college_name: "North Hills Arts and Science",
+        course: "Arts and Science",
+        specialisation: "Psychology",
+        location: "Hassan",
+        fees: 98000,
+        exam: "Merit",
+        rating: 4.0,
+        approval: "UGC",
+        university: "University of Mysore",
+        ownership: "Government"
+      },
+      {
+        id: "c-8",
+        college_name: "Blue Crest Institute of Design",
+        course: "Design",
+        specialisation: "Communication Design",
+        location: "Bengaluru Urban",
+        fees: 315000,
+        exam: "NID DAT",
+        rating: 4.3,
+        approval: "UGC",
+        university: "Private University",
+        ownership: "Private"
+      }
+    ];
+
+    const NAV_ITEMS = [
+      { id: "home", label: "Home" },
+      { id: "finder", label: "College Finder" },
+      { id: "compare", label: "Compare" },
+      { id: "guidance", label: "Guidance" },
+      { id: "tools", label: "Tools" }
+    ];
+
+    const INITIAL_FILTERS = {
+      search: "",
+      stream: "",
+      location: "",
+      maxFee: 650000,
+      minRating: 0
+    };
+
+    const formatINR = (value) => {
+      if (!value || Number(value) <= 0) {
+        return "Not listed";
+      }
+      return `INR ${new Intl.NumberFormat("en-IN").format(value)}`;
+    };
+
+    const uniqueValues = (values) => {
+      return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+    };
+
+    const parseUniversityFromDescription = (description) => {
+      if (!description || typeof description !== "string") {
+        return "";
+      }
+      const splitIndex = description.indexOf(" - ");
+      if (splitIndex === -1) {
+        return "";
+      }
+      return description.slice(splitIndex + 3).trim();
+    };
+
+    const normalizeCollege = (raw, index) => {
+      const name = raw.college_name || raw.title || "Unknown College";
+      const idSeed = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      const id = String(raw.id || raw.college_id || `${idSeed}-${index + 1}`);
+
+      return {
+        id,
+        name,
+        stream: raw.course || raw.course_name || "General",
+        specialization:
+          raw.specialisation ||
+          raw.specialization ||
+          raw.specializations ||
+          raw.badge ||
+          "General",
+        location: raw.location || raw.city || "Karnataka",
+        fee: Number(raw.fees || raw.fees_max || raw.fees_min || 0) || 0,
+        exam: raw.exam || raw.exam_required || "Not specified",
+        rating: Number(raw.rating || 0) || 0,
+        approval: raw.approval || "Verified",
+        university:
+          raw.university ||
+          raw.affiliated_university ||
+          parseUniversityFromDescription(raw.description) ||
+          "Not specified",
+        ownership: raw.ownership || raw.type || "Not specified"
+      };
+    };
+
+    const getApiRows = (payload) => {
+      if (Array.isArray(payload)) {
+        return payload;
+      }
+      if (payload && Array.isArray(payload.courses)) {
+        return payload.courses;
+      }
+      return [];
+    };
+
+    const loadCollegeData = async () => {
+      for (const endpoint of API_ENDPOINTS) {
+        try {
+          const response = await fetch(endpoint, { cache: "no-store" });
+          if (!response.ok) {
+            continue;
+          }
+          const payload = await response.json();
+          const rows = getApiRows(payload);
+          if (!rows.length) {
+            continue;
+          }
+          return rows.map(normalizeCollege);
+        } catch (_error) {
+          // keep trying the next endpoint
+        }
+      }
+      return FALLBACK_COLLEGES.map(normalizeCollege);
+    };
+
+    function App() {
+      const [colleges, setColleges] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState("");
+      const [activeSection, setActiveSection] = useState("home");
+      const [heroForm, setHeroForm] = useState({ query: "", stream: "", location: "" });
+      const [filters, setFilters] = useState(INITIAL_FILTERS);
+      const [visibleCount, setVisibleCount] = useState(6);
+      const [compareIds, setCompareIds] = useState([]);
+      const [savedIds, setSavedIds] = useState(() => {
+        try {
+          return JSON.parse(localStorage.getItem("pathup-react-saved") || "[]");
+        } catch (_error) {
+          return [];
+        }
+      });
+      const [recentIds, setRecentIds] = useState(() => {
+        try {
+          return JSON.parse(localStorage.getItem("pathup-react-recent") || "[]");
+        } catch (_error) {
+          return [];
+        }
+      });
+      const [toast, setToast] = useState("");
+
+      useEffect(() => {
+        let mounted = true;
+
+        loadCollegeData()
+          .then((rows) => {
+            if (!mounted) {
+              return;
+            }
+            setColleges(rows);
+            if (rows.length === 0) {
+              setError("No colleges are currently available.");
+            }
+          })
+          .catch(() => {
+            if (!mounted) {
+              return;
+            }
+            setError("Unable to load live data. Showing sample colleges.");
+            setColleges(FALLBACK_COLLEGES.map(normalizeCollege));
+          })
+          .finally(() => {
+            if (mounted) {
+              setIsLoading(false);
+            }
+          });
+
+        return () => {
+          mounted = false;
+        };
+      }, []);
+
+      useEffect(() => {
+        localStorage.setItem("pathup-react-saved", JSON.stringify(savedIds));
+      }, [savedIds]);
+
+      useEffect(() => {
+        localStorage.setItem("pathup-react-recent", JSON.stringify(recentIds));
+      }, [recentIds]);
+
+      useEffect(() => {
+        if (!toast) {
+          return undefined;
+        }
+        const timer = setTimeout(() => setToast(""), 2200);
+        return () => clearTimeout(timer);
+      }, [toast]);
+
+      useEffect(() => {
+        const ids = NAV_ITEMS.map((item) => item.id);
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+            if (visible.length > 0) {
+              setActiveSection(visible[0].target.id);
+            }
+          },
+          {
+            rootMargin: "-30% 0px -55% 0px",
+            threshold: [0.2, 0.45, 0.6]
+          }
+        );
+
+        ids.forEach((id) => {
+          const node = document.getElementById(id);
+          if (node) {
+            observer.observe(node);
+          }
+        });
+
+        return () => observer.disconnect();
+      }, []);
+
+      const streams = useMemo(() => uniqueValues(colleges.map((college) => college.stream)), [colleges]);
+      const locations = useMemo(() => uniqueValues(colleges.map((college) => college.location)), [colleges]);
+
+      const quickStreams = useMemo(() => {
+        if (streams.length) {
+          return streams.slice(0, 4);
+        }
+        return ["Engineering", "BCA", "Nursing", "Management"];
+      }, [streams]);
+
+      const filteredColleges = useMemo(() => {
+        const query = filters.search.trim().toLowerCase();
+
+        return colleges.filter((college) => {
+          const haystack = [
+            college.name,
+            college.stream,
+            college.specialization,
+            college.location,
+            college.exam,
+            college.university,
+            college.ownership
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          const matchesQuery = !query || haystack.includes(query);
+          const matchesStream = !filters.stream || college.stream === filters.stream;
+          const matchesLocation = !filters.location || college.location === filters.location;
+          const matchesFee = college.fee === 0 || college.fee <= Number(filters.maxFee);
+          const matchesRating = Number(filters.minRating) === 0 || college.rating >= Number(filters.minRating);
+
+          return matchesQuery && matchesStream && matchesLocation && matchesFee && matchesRating;
+        });
+      }, [colleges, filters]);
+
+      const visibleColleges = useMemo(() => {
+        return filteredColleges.slice(0, visibleCount);
+      }, [filteredColleges, visibleCount]);
+
+      const savedSet = useMemo(() => new Set(savedIds), [savedIds]);
+      const compareSet = useMemo(() => new Set(compareIds), [compareIds]);
+
+      const compareColleges = useMemo(() => {
+        return compareIds
+          .map((id) => colleges.find((college) => college.id === id))
+          .filter(Boolean);
+      }, [compareIds, colleges]);
+
+      const savedColleges = useMemo(() => {
+        return colleges.filter((college) => savedSet.has(college.id)).slice(0, 6);
+      }, [colleges, savedSet]);
+
+      const recentColleges = useMemo(() => {
+        return recentIds
+          .map((id) => colleges.find((college) => college.id === id))
+          .filter(Boolean)
+          .slice(0, 6);
+      }, [recentIds, colleges]);
+
+      const scrollToSection = (id) => {
+        const section = document.getElementById(id);
+        if (!section) {
+          return;
+        }
+        setActiveSection(id);
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+
+      const onHeroSubmit = (event) => {
+        event.preventDefault();
+        setFilters((prev) => ({
+          ...prev,
+          search: heroForm.query,
+          stream: heroForm.stream,
+          location: heroForm.location
+        }));
+        setVisibleCount(6);
+        setToast("Finder updated with your preferences.");
+        scrollToSection("finder");
+      };
+
+      const toggleSaved = (id) => {
+        setSavedIds((prev) => {
+          if (prev.includes(id)) {
+            setToast("Removed from shortlist.");
+            return prev.filter((item) => item !== id);
+          }
+          setToast("Added to shortlist.");
+          return [id, ...prev].slice(0, 30);
+        });
+      };
+
+      const toggleCompare = (id) => {
+        setCompareIds((prev) => {
+          if (prev.includes(id)) {
+            setToast("Removed from comparison.");
+            return prev.filter((item) => item !== id);
+          }
+          if (prev.length >= 3) {
+            setToast("You can compare up to 3 colleges.");
+            return prev;
+          }
+          setToast("Added to comparison.");
+          return [...prev, id];
+        });
+      };
+
+      const viewCollege = (id) => {
+        const selected = colleges.find((college) => college.id === id);
+        if (!selected) {
+          return;
+        }
+        setRecentIds((prev) => [id, ...prev.filter((item) => item !== id)].slice(0, 12));
+        setToast(`Viewing ${selected.name}`);
+      };
+
+      const resetFilters = () => {
+        setFilters(INITIAL_FILTERS);
+        setVisibleCount(6);
+        setToast("Filters reset.");
+      };
+
+      const chooseQuickStream = (stream) => {
+        setFilters((prev) => ({ ...prev, stream, search: "" }));
+        setVisibleCount(6);
+        setHeroForm((prev) => ({ ...prev, stream, query: "" }));
+        setToast(`${stream} selected.`);
+        scrollToSection("finder");
+      };
+
+      const guidanceCards = [
+        {
+          title: "Analytical and Math",
+          text: "Recommended tracks: CSE, Data Science, Statistics.",
+          action: "Explore Tech Paths"
+        },
+        {
+          title: "Leadership and Business",
+          text: "Recommended tracks: BBA, Economics, Product and Operations.",
+          action: "Explore Management Paths"
+        },
+        {
+          title: "Creative and Human Sciences",
+          text: "Recommended tracks: Psychology, Design, Media and Communication.",
+          action: "Explore Creative Paths"
+        }
+      ];
+
+      const tools = [
+        {
+          title: "Shortlist Planner",
+          text: "Track safe, target, and dream college options in one board."
+        },
+        {
+          title: "Fee Readiness",
+          text: "Estimate total cost with hostel, scholarship, and loan scenarios."
+        },
+        {
+          title: "Exam Timeline",
+          text: "Stay on top of forms, counseling rounds, and deadlines."
+        },
+        {
+          title: "Profile Matcher",
+          text: "See where your score, budget, and preferences align best."
+        }
+      ];
+
+      return (
+        <>
+          <header className="site-header">
+            <div className="shell header-row">
+              <div className="brand">
+                <div className="logo">P</div>
+                <div className="brand-copy">
+                  <span className="brand-name">PathUp</span>
+                  <span className="brand-sub">College discovery with clarity</span>
+                </div>
               </div>
-              <div class="input-group">
-                <label for="heroCourse">Course Stream</label>
-                <select id="heroCourse">
-                  <option value="">All Streams</option>
-                <option>Engineering</option>
-                <option>BCA</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label for="heroLocation">Location</label>
-                <select id="heroLocation">
-                <option value="">All Karnataka</option>
-                <option>Bengaluru Urban</option>
-                <option>Bengaluru Rural</option>
-                <option>Tumakuru</option>
-                <option>Ramanagara</option>
-                <option>Kolar</option>
-                <option>Dakshina Kannada</option>
-                <option>Chikkamagaluru</option>
-                <option>Mysuru</option>
-                <option>Hassan</option>
-                <option>Dharwad</option>
-                <option>Hubli</option>
-                <option>Gadag</option>
-                <option>Uttara Kannada</option>
-                <option>Udupi</option>
-                <option>Kodagu</option>
-                </select>
-              </div>
-              <button class="btn btn-primary" type="submit">Explore Colleges</button>
-              <button class="btn btn-secondary" type="button" data-route="career">Take Career Quiz</button>
-            </form>
-            <div class="hero-metrics">
-              <div class="metric-card">
-                <span class="metric-value">2,100+</span>
-                <span class="metric-label">Colleges indexed</span>
-              </div>
-              <div class="metric-card">
-                <span class="metric-value">480+</span>
-                <span class="metric-label">Specializations</span>
-              </div>
-              <div class="metric-card">
-                <span class="metric-value">1M+</span>
-                <span class="metric-label">Student decisions supported</span>
+
+              <nav className="top-nav" aria-label="Main navigation">
+                {NAV_ITEMS.map((item) => (
+                  <button
+                    key={item.id}
+                    className={`nav-btn ${activeSection === item.id ? "active" : ""}`}
+                    onClick={() => scrollToSection(item.id)}
+                    type="button"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+
+              <div className="header-cta">
+                <button className="btn btn-ghost" type="button" onClick={() => scrollToSection("guidance")}>
+                  Career Quiz
+                </button>
+                <button className="btn btn-primary" type="button" onClick={() => scrollToSection("finder")}>
+                  Explore Colleges
+                </button>
               </div>
             </div>
-          </div>
-          <div class="hero-panel">
-            <div class="panel-card">
-              <h3>Smart Search Insights</h3>
-              <p>Shortlists based on fees, placements, NIRF performance and exam acceptance.</p>
-              <div class="panel-tags">
-                <span>Placement focus</span>
-                <span>Fee match</span>
-                <span>Exam fit</span>
-                <span>Verified sources</span>
+          </header>
+
+          <main>
+            <section id="home" className="hero">
+              <div className="shell hero-grid">
+                <div className="hero-copy">
+                  <span className="eyebrow">Trusted for students and parents</span>
+                  <h1>Find the right college. Build the right future.</h1>
+                  <p className="hero-sub">
+                    A modern, data-first way to shortlist colleges by stream, location, affordability, and outcomes.
+                    No clutter. No confusion.
+                  </p>
+
+                  <form className="hero-form" onSubmit={onHeroSubmit}>
+                    <div className="field">
+                      <label htmlFor="heroQuery">Course, College or Career</label>
+                      <input
+                        id="heroQuery"
+                        type="text"
+                        placeholder="Example: B.Tech, MBBS, Data Science"
+                        value={heroForm.query}
+                        onChange={(event) => setHeroForm((prev) => ({ ...prev, query: event.target.value }))}
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label htmlFor="heroStream">Stream</label>
+                      <select
+                        id="heroStream"
+                        value={heroForm.stream}
+                        onChange={(event) => setHeroForm((prev) => ({ ...prev, stream: event.target.value }))}
+                      >
+                        <option value="">All Streams</option>
+                        {streams.map((stream) => (
+                          <option key={stream} value={stream}>
+                            {stream}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="field">
+                      <label htmlFor="heroLocation">Location</label>
+                      <select
+                        id="heroLocation"
+                        value={heroForm.location}
+                        onChange={(event) => setHeroForm((prev) => ({ ...prev, location: event.target.value }))}
+                      >
+                        <option value="">All Locations</option>
+                        {locations.map((location) => (
+                          <option key={location} value={location}>
+                            {location}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <button className="btn btn-primary" type="submit">
+                      Start Finder
+                    </button>
+                  </form>
+
+                  <div className="stats">
+                    <div className="stat">
+                      <strong>{new Intl.NumberFormat("en-IN").format(colleges.length || 2100)}+</strong>
+                      <span>Colleges indexed</span>
+                    </div>
+                    <div className="stat">
+                      <strong>480+</strong>
+                      <span>Specializations</span>
+                    </div>
+                    <div className="stat">
+                      <strong>1M+</strong>
+                      <span>Decisions supported</span>
+                    </div>
+                  </div>
+                </div>
+
+                <aside className="hero-panel" aria-label="PathUp highlights">
+                  <h3>Built for confident decision-making</h3>
+                  <ul className="hero-list">
+                    <li>Smart filtering by stream, budget, and city.</li>
+                    <li>Comparison table for direct side-by-side decisions.</li>
+                    <li>Saved shortlists and recently viewed tracking.</li>
+                    <li>Career guidance with practical pathways.</li>
+                  </ul>
+                  <button className="btn btn-secondary" type="button" onClick={() => scrollToSection("compare")}>
+                    Open Compare View
+                  </button>
+                </aside>
               </div>
-              <div class="panel-cta">
-                <button class="btn btn-primary" data-route="finder">Start Finder</button>
+            </section>
+
+            <section className="section">
+              <div className="shell">
+                <div className="section-head">
+                  <div>
+                    <h2>Quick Discovery</h2>
+                    <p>Start with the stream you care about. We will tune the finder instantly.</p>
+                  </div>
+                </div>
+
+                <div className="quick-streams">
+                  {quickStreams.map((stream) => (
+                    <button key={stream} className="chip" type="button" onClick={() => chooseQuickStream(stream)}>
+                      {stream}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="insight-bar">
+                  <div>
+                    <h4>Verified Sources</h4>
+                    <p>Context from UGC, AICTE, NIRF and institution-level information.</p>
+                  </div>
+                  <div>
+                    <h4>Family-Friendly Planning</h4>
+                    <p>Shortlists are easy to share and compare with parents and mentors.</p>
+                  </div>
+                  <div>
+                    <h4>Outcome-Oriented</h4>
+                    <p>Balance affordability, eligibility, and career direction in one workflow.</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="panel-card muted">
-              <h3>Guided Pathways</h3>
-              <p>Map skills to courses, courses to colleges, and colleges to careers.</p>
-              <button class="link-button" data-route="career">See Career Guidance</button>
-            </div>
-          </div>
-        </div>
-      </section>
+            </section>
 
-      <section class="quick-tiles">
-        <div class="container">
-          <div class="section-head">
-            <h2>Quick Discovery</h2>
-            <p>Explore the most searched streams with guided tiles.</p>
-          </div>
-          <div class="tile-grid">
-            <button class="tile" data-stream="Engineering">
-              <span class="tile-icon">ENG</span>
-              <span>Engineering</span>
-            </button>
-            <button class="tile" data-stream="BCA">
-              <span class="tile-icon">BCA</span>
-              <span>BCA</span>
-            </button>
-          </div>
-        </div>
-      </section>
+            <section id="finder" className="section">
+              <div className="shell">
+                <div className="section-head">
+                  <div>
+                    <h2>Smart College Finder</h2>
+                    <p>Filter once, iterate quickly, and build a shortlist that matches your goals.</p>
+                  </div>
+                </div>
 
-      <section class="journey">
-        <div class="container journey-grid">
-          <div class="journey-copy">
-            <h2>Build your journey, not just a shortlist</h2>
-            <p>Pick a path, compare outcomes, and collect guidance from verified sources in one place.</p>
-            <div class="journey-actions">
-              <button class="btn btn-primary" data-route="finder">Start the Finder</button>
-              <button class="btn btn-ghost" data-route="tools">Open Tools Hub</button>
-            </div>
-          </div>
-          <div class="journey-cards">
-            <article class="journey-card">
-              <h3>Placement Lens</h3>
-              <p>See median salary, core roles and recruiters.</p>
-              <span class="journey-tag">Outcome data</span>
-            </article>
-            <article class="journey-card">
-              <h3>Scholarship Fit</h3>
-              <p>Match scholarships to eligibility and income.</p>
-              <span class="journey-tag">Financial aid</span>
-            </article>
-            <article class="journey-card">
-              <h3>Admission Map</h3>
-              <p>Track exams, cutoffs and timeline readiness.</p>
-              <span class="journey-tag">Timeline planning</span>
-            </article>
-          </div>
-        </div>
-      </section>
+                <div className="finder-wrap">
+                  <div className="finder-grid">
+                    <aside className="filters" aria-label="Finder filters">
+                      <h3>Filters</h3>
 
-      <section class="insight-strip">
-        <div class="container insight-grid">
-          <div>
-            <h3>Parents & mentors dashboard</h3>
-            <p>Share shortlists and compare options together.</p>
-          </div>
-          <div>
-            <h3>Verified sources only</h3>
-            <p>UGC, AICTE, NIRF and institutional data points.</p>
-          </div>
-          <div>
-            <h3>Personalized guidance</h3>
-            <p>Based on your priorities, not advertisements.</p>
-          </div>
-        </div>
-      </section>
+                      <div className="filter-row">
+                        <label htmlFor="searchInput">Search</label>
+                        <input
+                          id="searchInput"
+                          type="text"
+                          value={filters.search}
+                          onChange={(event) => {
+                            setFilters((prev) => ({ ...prev, search: event.target.value }));
+                            setVisibleCount(6);
+                          }}
+                          placeholder="College, specialization, exam"
+                        />
+                      </div>
 
-      <section id="trust" class="trust">
-        <div class="container">
-          <div class="section-head">
-            <h2>Trust and Credibility</h2>
-            <p>We prioritize transparent data sources and academic confidence.</p>
-          </div>
-          <div class="trust-grid">
-            <div class="trust-card">
-              <h3>UGC</h3>
-              <p>University Grants Commission recognized data.</p>
-            </div>
-            <div class="trust-card">
-              <h3>AICTE</h3>
-              <p>Approved engineering and technical institutions.</p>
-            </div>
-            <div class="trust-card">
-              <h3>INC</h3>
-              <p>Indian Nursing Council affiliated programs.</p>
-            </div>
-            <div class="trust-card">
-              <h3>NIRF</h3>
-              <p>National ranking and performance context.</p>
-            </div>
-          </div>
-          <div class="timeline">
-            <div class="timeline-item">
-              <span class="timeline-step">1</span>
-              <div>
-                <h4>We verify institutional data</h4>
-                <p>Accreditation, approvals and ownership are checked first.</p>
+                      <div className="filter-row">
+                        <label htmlFor="streamInput">Stream</label>
+                        <select
+                          id="streamInput"
+                          value={filters.stream}
+                          onChange={(event) => {
+                            const value = event.target.value;
+                            setFilters((prev) => ({ ...prev, stream: value }));
+                            setHeroForm((prev) => ({ ...prev, stream: value }));
+                            setVisibleCount(6);
+                          }}
+                        >
+                          <option value="">All Streams</option>
+                          {streams.map((stream) => (
+                            <option key={stream} value={stream}>
+                              {stream}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="filter-row">
+                        <label htmlFor="locationInput">Location</label>
+                        <select
+                          id="locationInput"
+                          value={filters.location}
+                          onChange={(event) => {
+                            const value = event.target.value;
+                            setFilters((prev) => ({ ...prev, location: value }));
+                            setHeroForm((prev) => ({ ...prev, location: value }));
+                            setVisibleCount(6);
+                          }}
+                        >
+                          <option value="">All Locations</option>
+                          {locations.map((location) => (
+                            <option key={location} value={location}>
+                              {location}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="filter-row">
+                        <label htmlFor="feeInput">Max Annual Fee</label>
+                        <input
+                          id="feeInput"
+                          type="range"
+                          min="50000"
+                          max="1200000"
+                          step="50000"
+                          value={filters.maxFee}
+                          onChange={(event) => {
+                            setFilters((prev) => ({ ...prev, maxFee: Number(event.target.value) }));
+                            setVisibleCount(6);
+                          }}
+                        />
+                        <span className="slider-note">Up to {formatINR(filters.maxFee)}</span>
+                      </div>
+
+                      <div className="filter-row">
+                        <label htmlFor="ratingInput">Minimum Rating</label>
+                        <select
+                          id="ratingInput"
+                          value={filters.minRating}
+                          onChange={(event) => {
+                            setFilters((prev) => ({ ...prev, minRating: Number(event.target.value) }));
+                            setVisibleCount(6);
+                          }}
+                        >
+                          <option value="0">Any Rating</option>
+                          <option value="4.5">4.5+</option>
+                          <option value="4.2">4.2+</option>
+                          <option value="4.0">4.0+</option>
+                        </select>
+                      </div>
+
+                      <button className="btn btn-ghost" type="button" onClick={resetFilters}>
+                        Reset Filters
+                      </button>
+
+                      <div>
+                        <h4>Saved Colleges</h4>
+                        <ul className="panel-list">
+                          {savedColleges.length === 0 ? <li>No saved colleges yet</li> : null}
+                          {savedColleges.map((college) => (
+                            <li key={college.id}>{college.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h4>Recently Viewed</h4>
+                        <ul className="panel-list">
+                          {recentColleges.length === 0 ? <li>No recent views</li> : null}
+                          {recentColleges.map((college) => (
+                            <li key={college.id}>{college.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </aside>
+
+                    <div className="results">
+                      <div className="results-head">
+                        <div>
+                          <h3>Results</h3>
+                          <p className="results-count">{filteredColleges.length} colleges found</p>
+                        </div>
+                        <button
+                          className="btn btn-secondary"
+                          type="button"
+                          onClick={() => {
+                            scrollToSection("compare");
+                            setToast("Opened comparison section.");
+                          }}
+                        >
+                          Go to Compare
+                        </button>
+                      </div>
+
+                      {isLoading ? <div className="loading">Loading colleges...</div> : null}
+                      {!isLoading && error ? <div className="error">{error}</div> : null}
+
+                      {!isLoading && filteredColleges.length === 0 ? (
+                        <div className="empty">No colleges match this filter set. Try relaxing stream, fee, or rating.</div>
+                      ) : null}
+
+                      <div className="college-grid">
+                        {visibleColleges.map((college) => (
+                          <article className="card" key={college.id}>
+                            <div className="card-top">
+                              <div>
+                                <h4>{college.name}</h4>
+                                <div className="meta">
+                                  <span>{college.location}</span>
+                                  <span>{college.university}</span>
+                                </div>
+                              </div>
+                              <span className="badge">{college.approval}</span>
+                            </div>
+
+                            <div className="pill-row">
+                              <span className="pill">{college.stream}</span>
+                              <span className="pill">{college.specialization}</span>
+                              <span className="pill">{college.ownership}</span>
+                            </div>
+
+                            <div className="meta">
+                              <span>Fees: {formatINR(college.fee)} per year</span>
+                              <span>Exam: {college.exam}</span>
+                              <span>Rating: {college.rating > 0 ? `${college.rating.toFixed(1)} / 5` : "Not available"}</span>
+                            </div>
+
+                            <div className="card-actions">
+                              <button
+                                type="button"
+                                className={`mini-btn ${compareSet.has(college.id) ? "active" : ""}`}
+                                onClick={() => toggleCompare(college.id)}
+                              >
+                                {compareSet.has(college.id) ? "Compared" : "Compare"}
+                              </button>
+
+                              <button
+                                type="button"
+                                className={`mini-btn ${savedSet.has(college.id) ? "active" : ""}`}
+                                onClick={() => toggleSaved(college.id)}
+                              >
+                                {savedSet.has(college.id) ? "Saved" : "Save"}
+                              </button>
+
+                              <button type="button" className="mini-btn" onClick={() => viewCollege(college.id)}>
+                                View
+                              </button>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+
+                      {!isLoading && filteredColleges.length > visibleCount ? (
+                        <button
+                          className="btn btn-ghost"
+                          type="button"
+                          onClick={() => setVisibleCount((prev) => prev + 6)}
+                        >
+                          Load More Colleges
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="timeline-item">
-              <span class="timeline-step">2</span>
-              <div>
-                <h4>We contextualize outcomes</h4>
-                <p>Fees, placements and intake are compared for clarity.</p>
+            </section>
+
+            <section id="compare" className="section">
+              <div className="shell">
+                <div className="section-head">
+                  <div>
+                    <h2>Compare Colleges</h2>
+                    <p>Add up to three options from the finder for a direct, structured comparison.</p>
+                  </div>
+                </div>
+
+                {compareColleges.length === 0 ? (
+                  <div className="empty">Select colleges from the finder to populate the comparison table.</div>
+                ) : (
+                  <div className="compare-wrap">
+                    <table aria-label="College comparison table">
+                      <thead>
+                        <tr>
+                          <th>Criteria</th>
+                          {compareColleges.map((college) => (
+                            <th key={college.id}>{college.name}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Location</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-location`}>{college.location}</td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td>Stream</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-stream`}>{college.stream}</td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td>Specialization</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-specialization`}>{college.specialization}</td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td>Annual Fees</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-fee`}>{formatINR(college.fee)}</td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td>Exam</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-exam`}>{college.exam}</td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td>Approval</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-approval`}>{college.approval}</td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td>Rating</td>
+                          {compareColleges.map((college) => (
+                            <td key={`${college.id}-rating`}>
+                              {college.rating > 0 ? `${college.rating.toFixed(1)} / 5` : "Not available"}
+                            </td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
-            </div>
-            <div class="timeline-item">
-              <span class="timeline-step">3</span>
-              <div>
-                <h4>We guide students to the right fit</h4>
-                <p>Mentor-like insights help families make confident decisions.</p>
+            </section>
+
+            <section id="guidance" className="section">
+              <div className="shell">
+                <div className="section-head">
+                  <div>
+                    <h2>Career Guidance</h2>
+                    <p>Understand pathways from interests and skills to courses, colleges, and future roles.</p>
+                  </div>
+                </div>
+
+                <div className="guidance-grid">
+                  {guidanceCards.map((card) => (
+                    <article className="panel-card" key={card.title}>
+                      <h3>{card.title}</h3>
+                      <p>{card.text}</p>
+                      <button className="btn btn-secondary" type="button" onClick={() => scrollToSection("finder")}>
+                        {card.action}
+                      </button>
+                    </article>
+                  ))}
+                </div>
               </div>
+            </section>
+
+            <section id="tools" className="section">
+              <div className="shell">
+                <div className="section-head">
+                  <div>
+                    <h2>Student Tools Hub</h2>
+                    <p>Use planning tools built to reduce stress and improve decision quality.</p>
+                  </div>
+                </div>
+
+                <div className="tools-grid">
+                  {tools.map((tool) => (
+                    <article className="panel-card" key={tool.title}>
+                      <h3>{tool.title}</h3>
+                      <p>{tool.text}</p>
+                      <button className="btn btn-ghost" type="button" onClick={() => scrollToSection("finder")}>
+                        Open Tool
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </main>
+
+          <footer className="site-footer">
+            <div className="shell">
+              <div className="footer-grid">
+                <div className="footer-col">
+                  <h3 className="footer-title">PathUp</h3>
+                  <span>Professional guidance for high-impact education decisions.</span>
+                  <span>Built for students, parents, and mentors.</span>
+                </div>
+                <div className="footer-col">
+                  <h3 className="footer-title">Explore</h3>
+                  <span>College Finder</span>
+                  <span>Comparison Workspace</span>
+                  <span>Career Guidance</span>
+                </div>
+                <div className="footer-col">
+                  <h3 className="footer-title">Contact</h3>
+                  <span>pathup.edu@gmail.com</span>
+                  <span>+91 7902316091</span>
+                  <span>Privacy and disclaimer</span>
+                </div>
+              </div>
+              <div className="footer-note">PathUp 2026. All rights reserved.</div>
             </div>
-          </div>
-        </div>
-      </section>
-    </section>
+          </footer>
 
-    <section class="page" data-page="finder">
-      <section class="page-hero">
-        <div class="container page-hero-inner">
-          <div>
-            <h2>College Finder</h2>
-            <p>Filters, comparisons, and shortlists are now a dedicated view.</p>
+          <div className={`toast ${toast ? "show" : ""}`} role="status" aria-live="polite">
+            {toast}
           </div>
-          <button class="btn btn-secondary" data-route="compare">Go to Compare</button>
-        </div>
-      </section>
-      <section class="finder" id="finder">
-      <div class="container finder-grid">
-        <aside class="filters" aria-label="College filters">
-          <div class="filter-header">
-            <h2>Smart College Finder</h2>
-            <p>Filters stay with you as you browse.</p>
-          </div>
-          <div class="filter-group">
-            <label for="searchInput">Search</label>
-            <input id="searchInput" type="text" placeholder="Search by college or specialization">
-          </div>
-          <div class="filter-group">
-            <label for="filterCourse">Course</label>
-            <select id="filterCourse">
-              <option value="">All Courses</option>
-              <option>Engineering</option>
-              <option>BCA</option>
-              <option>Nursing</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="filterSpecialization">Specialization</label>
-            <select id="filterSpecialization">
-              <option value="">All Specializations</option>
-              <option>Various Engineering Branches</option>
-              <option>Computer Applications</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="filterLocation">Location</label>
-            <select id="filterLocation">
-              <option value="">All Karnataka</option>
-              <option>Bengaluru Urban</option>
-              <option>Bengaluru Rural</option>
-              <option>Tumakuru</option>
-              <option>Ramanagara</option>
-              <option>Kolar</option>
-              <option>Dakshina Kannada</option>
-              <option>Chikkamagaluru</option>
-              <option>Mysuru</option>
-              <option>Hassan</option>
-              <option>Dharwad</option>
-              <option>Hubli</option>
-              <option>Gadag</option>
-              <option>Uttara Kannada</option>
-              <option>Udupi</option>
-              <option>Kodagu</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="feeRange">Max Fees (per year)</label>
-            <input type="range" id="feeRange" min="50000" max="1200000" step="50000" value="600000">
-            <span id="feeValue" class="range-value">Up to INR 6,00,000</span>
-          </div>
-          <div class="filter-group">
-            <span class="label">Ownership</span>
-            <label class="check"><input type="checkbox" name="ownership" value="Government"> Government</label>
-            <label class="check"><input type="checkbox" name="ownership" value="Private"> Private</label>
-            <label class="check"><input type="checkbox" name="ownership" value="Deemed"> Deemed</label>
-          </div>
-          <div class="filter-group">
-            <label for="filterExam">Exams Accepted</label>
-            <select id="filterExam">
-              <option value="">Any Exam</option>
-              <option>JEE Main</option>
-              <option>NEET</option>
-              <option>CAT</option>
-              <option>CUET</option>
-              <option>State CET</option>
-              <option>COMEDK</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="filterRating">Minimum Rating</label>
-            <select id="filterRating">
-              <option value="">Any Rating</option>
-              <option value="4.5">4.5+</option>
-              <option value="4.2">4.2+</option>
-              <option value="4.0">4.0+</option>
-              <option value="3.8">3.8+</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <h3>Saved Colleges</h3>
-            <ul id="savedList" class="list-muted"></ul>
-          </div>
-          <div class="filter-group">
-            <h3>Recently Viewed</h3>
-            <ul id="recentList" class="list-muted"></ul>
-          </div>
-        </aside>
+        </>
+      );
+    }
 
-        <div class="results">
-          <div class="results-head">
-            <div>
-              <h2>College Shortlist</h2>
-              <p>Focused results tuned to your preferences.</p>
-            </div>
-            <div class="results-actions">
-              <span id="resultsCount" aria-live="polite"></span>
-              <button id="resetFilters" class="btn btn-ghost">Reset Filters</button>
-            </div>
-          </div>
-          <div id="collegeGrid" class="college-grid"></div>
-          <div class="results-footer">
-            <button id="loadMore" class="btn btn-secondary">Load More Colleges</button>
-            <span class="small-note">Data loaded from PathUp backend database.</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    </section>
-
-    <section class="page" data-page="career">
-      <section class="page-hero">
-        <div class="container page-hero-inner">
-          <div>
-            <h2>Career Guidance</h2>
-            <p>Choose a path, see courses, and connect to outcomes.</p>
-          </div>
-          <button class="btn btn-secondary" data-route="tools">Explore Tools</button>
-        </div>
-      </section>
-      <section id="career" class="career">
-      <div class="container">
-        <div class="section-head">
-          <h2>Not sure what to choose?</h2>
-          <p>AI-assisted guidance that maps skills to outcomes.</p>
-        </div>
-        <div class="career-grid">
-          <div class="career-card">
-            <h3>Analytical and Math</h3>
-            <div class="path-steps">
-              <div class="path-step"><span>Skills</span><strong>Problem solving, statistics</strong></div>
-              <div class="path-step"><span>Courses</span><strong>B.Tech CSE, B.Sc Data Science</strong></div>
-              <div class="path-step"><span>Colleges</span><strong>Top CSE institutes, data focused universities</strong></div>
-              <div class="path-step"><span>Careers</span><strong>Data Analyst, ML Engineer</strong></div>
-            </div>
-            <button class="btn btn-primary" data-route="finder">Take Career Guidance Test</button>
-          </div>
-          <div class="career-card">
-            <h3>People and Leadership</h3>
-            <div class="path-steps">
-              <div class="path-step"><span>Skills</span><strong>Communication, leadership</strong></div>
-              <div class="path-step"><span>Courses</span><strong>BBA, MBA, Hospital Administration</strong></div>
-              <div class="path-step"><span>Colleges</span><strong>Management schools, healthcare institutes</strong></div>
-              <div class="path-step"><span>Careers</span><strong>Product Manager, Operations Lead</strong></div>
-            </div>
-            <button class="btn btn-primary" data-route="tools">Explore Guidance Tools</button>
-          </div>
-          <div class="career-card">
-            <h3>Creative and Human Sciences</h3>
-            <div class="path-steps">
-              <div class="path-step"><span>Skills</span><strong>Design, empathy, research</strong></div>
-              <div class="path-step"><span>Courses</span><strong>Psychology, Design, Media</strong></div>
-              <div class="path-step"><span>Colleges</span><strong>Liberal arts universities, design schools</strong></div>
-              <div class="path-step"><span>Careers</span><strong>UX Designer, Counsellor</strong></div>
-            </div>
-            <button class="btn btn-primary" data-route="compare">Compare Colleges</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    </section>
-
-    <section class="page" data-page="compare">
-      <section class="page-hero">
-        <div class="container page-hero-inner">
-          <div>
-            <h2>Compare Colleges</h2>
-            <p>Side-by-side comparison for up to three options.</p>
-          </div>
-          <button class="btn btn-secondary" data-route="finder">Back to Finder</button>
-        </div>
-      </section>
-      <section id="compare" class="compare">
-      <div class="container">
-        <div class="section-head">
-          <h2>Compare Colleges Side by Side</h2>
-          <p>Fees, intake, eligibility and placements in a single view.</p>
-        </div>
-        <div id="compareEmpty" class="compare-empty">Select up to 3 colleges to compare.</div>
-        <div class="table-wrap">
-          <table id="compareTable" aria-label="College comparison"></table>
-        </div>
-      </div>
-    </section>
-
-    </section>
-
-    <section class="page" data-page="tools">
-      <section class="page-hero">
-        <div class="container page-hero-inner">
-          <div>
-            <h2>Student Tools Hub</h2>
-            <p>Focused tools for planning, shortlisting, and readiness.</p>
-          </div>
-          <button class="btn btn-secondary" data-route="finder">Open Finder</button>
-        </div>
-      </section>
-      <section id="tools" class="tools">
-      <div class="container">
-        <div class="section-head">
-          <h2>Student Tools Hub</h2>
-          <p>Fast, focused tools for smarter planning.</p>
-        </div>
-        <div class="tool-grid">
-          <div class="tool-card">
-            <h3>College Shortlist</h3>
-            <p>Save and compare your best-fit colleges.</p>
-            <button class="btn btn-secondary" data-route="finder">Build Shortlist</button>
-          </div>
-          <div class="tool-card">
-            <h3>Fee Calculator</h3>
-            <p>Estimate year-wise expenses and scholarships.</p>
-            <button class="btn btn-secondary">Open Calculator</button>
-          </div>
-          <div class="tool-card">
-            <h3>Cutoff Predictor</h3>
-            <p>Plan safely based on past cutoff trends.</p>
-            <button class="btn btn-secondary">Check Cutoffs</button>
-          </div>
-          <div class="tool-card">
-            <h3>Exam Calendar</h3>
-            <p>Track important dates and application windows.</p>
-            <button class="btn btn-secondary">View Calendar</button>
-          </div>
-        </div>
-      </div>
-    </section>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-        <div class="brand footer-brand">
-          <div class="logo-mark">P</div>
-          <div class="brand-text">
-            <span class="brand-name">PathUp</span>
-            <span class="brand-tag">Guided college discovery</span>
-          </div>
-        </div>
-        <p class="footer-note">A calm, structured platform built for Indian students and parents making life-changing choices.</p>
-      </div>
-      <div>
-        <h4>Quick Links</h4>
-        <a href="#/finder" data-route="finder">College Finder</a>
-        <a href="#/career" data-route="career">Career Guidance</a>
-        <a href="#/compare" data-route="compare">Compare</a>
-        <a href="#/tools" data-route="tools">Student Tools</a>
-      </div>
-      <div>
-        <h4>Course Categories</h4>
-        <a href="#/finder" data-route="finder">Engineering</a>
-        <a href="#/finder" data-route="finder">Medical</a>
-        <a href="#/finder" data-route="finder">Management</a>
-        <a href="#/finder" data-route="finder">Arts and Science</a>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <span>pathup.edu@gmail.com</span>
-        <span>+91 7902316091</span>
-        <span>Privacy and Disclaimer</span>
-      </div>
-    </div>
-    <div class="footer-bottom">PathUp 2026. All rights reserved.</div>
-  </footer>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="home_script.js"></script>
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
 </body>
 </html>
+

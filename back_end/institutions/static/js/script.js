@@ -9,15 +9,13 @@ const API_ENDPOINTS = [
 
 const state = {
   visibleCount: 6,
-  compare: [],
+  compare: [...new Set(JSON.parse(localStorage.getItem("pathup-compare") || "[]"))].slice(0, 3),
   saved: new Set(JSON.parse(localStorage.getItem("pathup-saved") || "[]")),
   recent: JSON.parse(localStorage.getItem("pathup-recent") || "[]")
 };
 
 const elements = {
   header: document.querySelector(".site-header"),
-  heroSearch: document.getElementById("heroSearch"),
-  heroQuery: document.getElementById("heroQuery"),
   heroCourse: document.getElementById("heroCourse"),
   heroLocation: document.getElementById("heroLocation"),
   searchInput: document.getElementById("searchInput"),
@@ -36,55 +34,11 @@ const elements = {
   recentList: document.getElementById("recentList"),
   compareTable: document.getElementById("compareTable"),
   compareEmpty: document.getElementById("compareEmpty"),
-  pageIndicator: document.getElementById("pageIndicator"),
   toast: document.getElementById("toast")
 };
 
-let filteredColleges = [...colleges];
-
-const routes = {
-  home: "Home",
-  finder: "College Finder",
-  career: "Career Guidance",
-  compare: "Compare",
-  tools: "Student Tools"
-};
-
-const getRouteFromHash = () => {
-  const raw = window.location.hash.replace("#/", "").replace("#", "");
-  return routes[raw] ? raw : "home";
-};
-
-const applyRoute = (route, { scroll = true } = {}) => {
-  const safeRoute = routes[route] ? route : "home";
-  document.querySelectorAll(".page").forEach((page) => {
-    page.classList.toggle("active", page.dataset.page === safeRoute);
-  });
-  document.querySelectorAll("[data-route]").forEach((link) => {
-    link.classList.toggle("active", link.getAttribute("data-route") === safeRoute);
-  });
-  if (elements.pageIndicator) {
-    elements.pageIndicator.textContent = routes[safeRoute];
-  }
-  if (scroll) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-};
-
-const navigateTo = (route, { scroll = true } = {}) => {
-  const safeRoute = routes[route] ? route : "home";
-  applyRoute(safeRoute, { scroll });
-  const targetHash = `#/${safeRoute}`;
-  if (window.location.hash !== targetHash) {
-    window.location.hash = `/${safeRoute}`;
-  }
-};
-
-const jumpToSection = (id) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth" }));
-};
+let filteredColleges = [];
+let finderParamsApplied = false;
 
 const formatFeeRange = (value) => {
   const format = new Intl.NumberFormat("en-IN");
@@ -142,11 +96,40 @@ const uniqueValues = (values) => {
 };
 
 const setSelectOptions = (selectElement, values, defaultLabel) => {
+  if (!selectElement) {
+    return;
+  }
+
   const previousValue = selectElement.value;
   selectElement.innerHTML = "";
   selectElement.add(new Option(defaultLabel, ""));
   values.forEach((value) => selectElement.add(new Option(value, value)));
   selectElement.value = values.includes(previousValue) ? previousValue : "";
+};
+
+const applyFinderParamsFromQuery = () => {
+  if (finderParamsApplied || !elements.searchInput) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const search = params.get("search");
+  const course = params.get("course");
+  const location = params.get("location");
+
+  if (search) {
+    elements.searchInput.value = search;
+  }
+
+  if (course && elements.filterCourse) {
+    elements.filterCourse.value = course;
+  }
+
+  if (location && elements.filterLocation) {
+    elements.filterLocation.value = location;
+  }
+
+  finderParamsApplied = true;
 };
 
 const populateFilterOptions = () => {
@@ -161,6 +144,8 @@ const populateFilterOptions = () => {
   setSelectOptions(elements.heroLocation, locations, "All Karnataka");
   setSelectOptions(elements.filterLocation, locations, "All Karnataka");
   setSelectOptions(elements.filterExam, exams, "Any Exam");
+
+  applyFinderParamsFromQuery();
 };
 
 const loadCollegeData = async () => {
@@ -188,10 +173,22 @@ const loadCollegeData = async () => {
 
   colleges = [];
   filteredColleges = [];
-  elements.collegeGrid.innerHTML = "<p>Unable to load college data from backend.</p>";
+
+  if (elements.collegeGrid) {
+    elements.collegeGrid.innerHTML = "<p>Unable to load college data from backend.</p>";
+  }
+  if (elements.resultsCount) {
+    elements.resultsCount.textContent = "0 colleges found";
+  }
+  if (elements.compareEmpty && state.compare.length) {
+    elements.compareEmpty.textContent = "Unable to load college data from backend.";
+  }
 };
 
 const showToast = (message) => {
+  if (!elements.toast) {
+    return;
+  }
   elements.toast.textContent = message;
   elements.toast.classList.add("show");
   setTimeout(() => elements.toast.classList.remove("show"), 2000);
@@ -200,6 +197,7 @@ const showToast = (message) => {
 const updateLocalStorage = () => {
   localStorage.setItem("pathup-saved", JSON.stringify([...state.saved]));
   localStorage.setItem("pathup-recent", JSON.stringify(state.recent));
+  localStorage.setItem("pathup-compare", JSON.stringify(state.compare));
 };
 
 const getOwnershipFilters = () => {
@@ -208,6 +206,18 @@ const getOwnershipFilters = () => {
 };
 
 const applyFilters = (resetCount = true) => {
+  if (
+    !elements.searchInput ||
+    !elements.filterCourse ||
+    !elements.filterSpecialization ||
+    !elements.filterLocation ||
+    !elements.feeRange ||
+    !elements.filterExam ||
+    !elements.filterRating
+  ) {
+    return;
+  }
+
   if (resetCount) {
     state.visibleCount = 6;
   }
@@ -260,11 +270,16 @@ const applyFilters = (resetCount = true) => {
 };
 
 const renderCollegeCards = () => {
+  if (!elements.collegeGrid) {
+    return;
+  }
+
+  const compareSet = new Set(state.compare);
   const visible = filteredColleges.slice(0, state.visibleCount);
   elements.collegeGrid.innerHTML = visible
     .map((college) => {
       const isSaved = state.saved.has(college.id);
-      const isCompared = state.compare.includes(college.id);
+      const isCompared = compareSet.has(college.id);
       const feeLabel = college.fees
         ? `INR ${new Intl.NumberFormat("en-IN").format(college.fees)}`
         : "Not available";
@@ -310,14 +325,21 @@ const renderCollegeCards = () => {
     })
     .join("");
 
-  elements.resultsCount.textContent = `${filteredColleges.length} colleges found`;
-  elements.loadMore.style.display = filteredColleges.length > state.visibleCount ? "inline-flex" : "none";
+  if (elements.resultsCount) {
+    elements.resultsCount.textContent = `${filteredColleges.length} colleges found`;
+  }
+  if (elements.loadMore) {
+    elements.loadMore.style.display = filteredColleges.length > state.visibleCount ? "inline-flex" : "none";
+  }
   renderCompareTable();
   renderSavedList();
   renderRecentList();
 };
 
 const renderSavedList = () => {
+  if (!elements.savedList) {
+    return;
+  }
   const saved = colleges.filter((college) => state.saved.has(college.id));
   elements.savedList.innerHTML = saved.length
     ? saved.map((college) => `<li>${college.college_name}</li>`).join("")
@@ -325,6 +347,9 @@ const renderSavedList = () => {
 };
 
 const renderRecentList = () => {
+  if (!elements.recentList) {
+    return;
+  }
   const recent = state.recent
     .map((id) => colleges.find((college) => college.id === id))
     .filter(Boolean);
@@ -334,14 +359,27 @@ const renderRecentList = () => {
 };
 
 const renderCompareTable = () => {
+  if (!elements.compareTable || !elements.compareEmpty) {
+    return;
+  }
+
   if (state.compare.length === 0) {
     elements.compareTable.innerHTML = "";
     elements.compareEmpty.style.display = "block";
     return;
   }
 
+  const selected = state.compare
+    .map((id) => colleges.find((college) => college.id === id))
+    .filter(Boolean);
+
+  if (selected.length === 0) {
+    elements.compareTable.innerHTML = "";
+    elements.compareEmpty.style.display = "block";
+    return;
+  }
+
   elements.compareEmpty.style.display = "none";
-  const selected = state.compare.map((id) => colleges.find((college) => college.id === id)).filter(Boolean);
 
   const rows = [
     { label: "Location", values: selected.map((c) => c.location || "Karnataka") },
@@ -379,6 +417,9 @@ const renderCompareTable = () => {
 };
 
 const setFeeLabel = () => {
+  if (!elements.feeRange || !elements.feeValue) {
+    return;
+  }
   elements.feeValue.textContent = formatFeeRange(elements.feeRange.value);
 };
 
@@ -419,43 +460,22 @@ const handleCardAction = (action, id) => {
 
   updateLocalStorage();
   renderCollegeCards();
+  renderCompareTable();
 };
 
-const bindEvents = () => {
+const bindCommonEvents = () => {
+  if (!elements.header) {
+    return;
+  }
   window.addEventListener("scroll", () => {
     elements.header.classList.toggle("scrolled", window.scrollY > 10);
   });
+};
 
-  document.addEventListener("click", (event) => {
-    const routeLink = event.target.closest("[data-route]");
-    if (!routeLink) return;
-    const route = routeLink.getAttribute("data-route");
-    if (!route) return;
-    if (routeLink.tagName === "A") {
-      event.preventDefault();
-    }
-    navigateTo(route);
-  });
-
-  elements.heroSearch.addEventListener("submit", (event) => {
-    event.preventDefault();
-    elements.searchInput.value = elements.heroQuery.value;
-    elements.filterCourse.value = elements.heroCourse.value;
-    elements.filterLocation.value = elements.heroLocation.value;
-    applyFilters();
-    navigateTo("finder", { scroll: false });
-    jumpToSection("finder");
-  });
-
-  document.querySelectorAll(".tile").forEach((tile) => {
-    tile.addEventListener("click", () => {
-      const stream = tile.getAttribute("data-stream");
-      elements.filterCourse.value = stream;
-      applyFilters();
-      navigateTo("finder", { scroll: false });
-      jumpToSection("finder");
-    });
-  });
+const bindFinderEvents = () => {
+  if (!elements.collegeGrid) {
+    return;
+  }
 
   [
     elements.searchInput,
@@ -464,34 +484,44 @@ const bindEvents = () => {
     elements.filterLocation,
     elements.filterExam,
     elements.filterRating
-  ].forEach((input) => input.addEventListener("input", () => applyFilters()));
+  ].forEach((input) => {
+    if (input) {
+      input.addEventListener("input", () => applyFilters());
+    }
+  });
 
   document.querySelectorAll("input[name='ownership']").forEach((input) => {
     input.addEventListener("change", () => applyFilters());
   });
 
-  elements.feeRange.addEventListener("input", () => {
-    setFeeLabel();
-    applyFilters(false);
-  });
+  if (elements.feeRange) {
+    elements.feeRange.addEventListener("input", () => {
+      setFeeLabel();
+      applyFilters(false);
+    });
+  }
 
-  elements.loadMore.addEventListener("click", () => {
-    state.visibleCount += 4;
-    renderCollegeCards();
-  });
+  if (elements.loadMore) {
+    elements.loadMore.addEventListener("click", () => {
+      state.visibleCount += 4;
+      renderCollegeCards();
+    });
+  }
 
-  elements.resetFilters.addEventListener("click", () => {
-    elements.searchInput.value = "";
-    elements.filterCourse.value = "";
-    elements.filterSpecialization.value = "";
-    elements.filterLocation.value = "";
-    elements.filterExam.value = "";
-    elements.filterRating.value = "";
-    elements.feeRange.value = 600000;
-    document.querySelectorAll("input[name='ownership']").forEach((input) => (input.checked = false));
-    setFeeLabel();
-    applyFilters();
-  });
+  if (elements.resetFilters) {
+    elements.resetFilters.addEventListener("click", () => {
+      elements.searchInput.value = "";
+      elements.filterCourse.value = "";
+      elements.filterSpecialization.value = "";
+      elements.filterLocation.value = "";
+      elements.filterExam.value = "";
+      elements.filterRating.value = "";
+      elements.feeRange.value = 600000;
+      document.querySelectorAll("input[name='ownership']").forEach((input) => (input.checked = false));
+      setFeeLabel();
+      applyFilters();
+    });
+  }
 
   elements.collegeGrid.addEventListener("click", (event) => {
     const button = event.target.closest("[data-action]");
@@ -504,12 +534,16 @@ const bindEvents = () => {
 
 const init = () => {
   setFeeLabel();
-  bindEvents();
+  bindCommonEvents();
+  bindFinderEvents();
+
   loadCollegeData().then(() => {
-    renderCollegeCards();
-    applyRoute(getRouteFromHash(), { scroll: false });
+    if (elements.collegeGrid) {
+      applyFilters();
+    } else {
+      renderCompareTable();
+    }
   });
-  window.addEventListener("hashchange", () => applyRoute(getRouteFromHash(), { scroll: false }));
 };
 
 init();

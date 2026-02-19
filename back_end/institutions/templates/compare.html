@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}PathUp | Compare Colleges{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <div>
+        <h2>Compare Colleges</h2>
+        <p>Side-by-side comparison for up to three options.</p>
+      </div>
+      <a class="btn btn-secondary" href="{% url 'finder' %}">Back to Finder</a>
+    </div>
+  </section>
+
+  <section id="compare" class="compare">
+    <div class="container">
+      <div class="section-head">
+        <h2>Compare Colleges Side by Side</h2>
+        <p>Fees, intake, eligibility and placements in a single view.</p>
+      </div>
+      <div id="compareEmpty" class="compare-empty">Select up to 3 colleges to compare.</div>
+      <div class="table-wrap">
+        <table id="compareTable" aria-label="College comparison"></table>
+      </div>
+    </div>
+  </section>
+{% endblock %}

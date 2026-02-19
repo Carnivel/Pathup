@@ -1,0 +1,97 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PathUp | Find the Right College. Build the Right Future.{% endblock %}</title>
+  <meta name="description" content="PathUp helps Indian students compare colleges, courses, fees, cutoffs and career outcomes with clarity and trust.">
+  <meta name="theme-color" content="#1e2a55">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="logo-mark">P</div>
+        <div class="brand-text">
+          <span class="brand-name">PathUp</span>
+          <span class="brand-tag">College discovery with clarity</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="{% url 'home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+        <a href="{% url 'finder' %}" class="{% if active_page == 'finder' %}active{% endif %}">College Finder</a>
+        <a href="{% url 'career' %}" class="{% if active_page == 'career' %}active{% endif %}">Career Guidance</a>
+        <a href="{% url 'compare' %}" class="{% if active_page == 'compare' %}active{% endif %}">Compare</a>
+        <a href="{% url 'tools' %}" class="{% if active_page == 'tools' %}active{% endif %}">Student Tools</a>
+      </nav>
+      <div class="header-cta">
+        <a class="btn btn-ghost" href="{% url 'career' %}">Take Career Quiz</a>
+        <a class="btn btn-primary" href="{% url 'finder' %}">Explore Colleges</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-indicator">
+    <div class="container page-indicator-inner">
+      <span class="page-label">You are in</span>
+      <strong>{{ page_indicator }}</strong>
+      <div class="page-actions">
+        <a class="chip-btn {% if active_page == 'home' %}active{% endif %}" href="{% url 'home' %}">Overview</a>
+        <a class="chip-btn {% if active_page == 'finder' %}active{% endif %}" href="{% url 'finder' %}">Finder</a>
+        <a class="chip-btn {% if active_page == 'career' %}active{% endif %}" href="{% url 'career' %}">Guidance</a>
+        <a class="chip-btn {% if active_page == 'compare' %}active{% endif %}" href="{% url 'compare' %}">Compare</a>
+        <a class="chip-btn {% if active_page == 'tools' %}active{% endif %}" href="{% url 'tools' %}">Tools</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand footer-brand">
+          <div class="logo-mark">P</div>
+          <div class="brand-text">
+            <span class="brand-name">PathUp</span>
+            <span class="brand-tag">Guided college discovery</span>
+          </div>
+        </div>
+        <p class="footer-note">A calm, structured platform built for Indian students and parents making life-changing choices.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <a href="{% url 'finder' %}">College Finder</a>
+        <a href="{% url 'career' %}">Career Guidance</a>
+        <a href="{% url 'compare' %}">Compare</a>
+        <a href="{% url 'tools' %}">Student Tools</a>
+      </div>
+      <div>
+        <h4>Course Categories</h4>
+        <a href="{% url 'finder' %}?course=Engineering">Engineering</a>
+        <a href="{% url 'finder' %}?search=Medical">Medical</a>
+        <a href="{% url 'finder' %}?search=Management">Management</a>
+        <a href="{% url 'finder' %}?search=Arts and Science">Arts and Science</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <span>pathup.edu@gmail.com</span>
+        <span>+91 7902316091</span>
+        <span>Privacy and Disclaimer</span>
+      </div>
+    </div>
+    <div class="footer-bottom">PathUp 2026. All rights reserved.</div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="{% static 'js/script.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

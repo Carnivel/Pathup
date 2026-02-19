@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}PathUp | College Finder{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div class="container page-hero-inner">
+      <div>
+        <h2>College Finder</h2>
+        <p>Filters, comparisons, and shortlists are now a dedicated view.</p>
+      </div>
+      <a class="btn btn-secondary" href="{% url 'compare' %}">Go to Compare</a>
+    </div>
+  </section>
+
+  <section class="finder" id="finder">
+    <div class="container finder-grid">
+      <aside class="filters" aria-label="College filters">
+        <div class="filter-header">
+          <h2>Smart College Finder</h2>
+          <p>Filters stay with you as you browse.</p>
+        </div>
+        <div class="filter-group">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="text" placeholder="Search by college or specialization">
+        </div>
+        <div class="filter-group">
+          <label for="filterCourse">Course</label>
+          <select id="filterCourse">
+            <option value="">All Courses</option>
+            <option>Engineering</option>
+            <option>BCA</option>
+            <option>Nursing</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filterSpecialization">Specialization</label>
+          <select id="filterSpecialization">
+            <option value="">All Specializations</option>
+            <option>Various Engineering Branches</option>
+            <option>Computer Applications</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filterLocation">Location</label>
+          <select id="filterLocation">
+            <option value="">All Karnataka</option>
+            <option>Bengaluru Urban</option>
+            <option>Bengaluru Rural</option>
+            <option>Tumakuru</option>
+            <option>Ramanagara</option>
+            <option>Kolar</option>
+            <option>Dakshina Kannada</option>
+            <option>Chikkamagaluru</option>
+            <option>Mysuru</option>
+            <option>Hassan</option>
+            <option>Dharwad</option>
+            <option>Hubli</option>
+            <option>Gadag</option>
+            <option>Uttara Kannada</option>
+            <option>Udupi</option>
+            <option>Kodagu</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="feeRange">Max Fees (per year)</label>
+          <input type="range" id="feeRange" min="50000" max="1200000" step="50000" value="600000">
+          <span id="feeValue" class="range-value">Up to INR 6,00,000</span>
+        </div>
+        <div class="filter-group">
+          <span class="label">Ownership</span>
+          <label class="check"><input type="checkbox" name="ownership" value="Government"> Government</label>
+          <label class="check"><input type="checkbox" name="ownership" value="Private"> Private</label>
+          <label class="check"><input type="checkbox" name="ownership" value="Deemed"> Deemed</label>
+        </div>
+        <div class="filter-group">
+          <label for="filterExam">Exams Accepted</label>
+          <select id="filterExam">
+            <option value="">Any Exam</option>
+            <option>JEE Main</option>
+            <option>NEET</option>
+            <option>CAT</option>
+            <option>CUET</option>
+            <option>State CET</option>
+            <option>COMEDK</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filterRating">Minimum Rating</label>
+          <select id="filterRating">
+            <option value="">Any Rating</option>
+            <option value="4.5">4.5+</option>
+            <option value="4.2">4.2+</option>
+            <option value="4.0">4.0+</option>
+            <option value="3.8">3.8+</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <h3>Saved Colleges</h3>
+          <ul id="savedList" class="list-muted"></ul>
+        </div>
+        <div class="filter-group">
+          <h3>Recently Viewed</h3>
+          <ul id="recentList" class="list-muted"></ul>
+        </div>
+      </aside>
+
+      <div class="results">
+        <div class="results-head">
+          <div>
+            <h2>College Shortlist</h2>
+            <p>Focused results tuned to your preferences.</p>
+          </div>
+          <div class="results-actions">
+            <span id="resultsCount" aria-live="polite"></span>
+            <button id="resetFilters" class="btn btn-ghost">Reset Filters</button>
+          </div>
+        </div>
+        <div id="collegeGrid" class="college-grid"></div>
+        <div class="results-footer">
+          <button id="loadMore" class="btn btn-secondary">Load More Colleges</button>
+          <span class="small-note">Data loaded from PathUp backend database.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
