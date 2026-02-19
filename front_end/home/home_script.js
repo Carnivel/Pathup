@@ -1,4 +1,11 @@
 let colleges = [];
+const API_ENDPOINTS = [
+  "../../back_end/courses.php?api=1",
+  "/Pathup/back_end/courses.php?api=1",
+  "../../pathup_api/courses.php",
+  "/Pathup/pathup_api/courses.php",
+  "home_data.json"
+];
 
 const state = {
   visibleCount: 6,
@@ -84,20 +91,104 @@ const formatFeeRange = (value) => {
   return `Up to INR ${format.format(value)}`;
 };
 
-const loadCollegeData = async () => {
-  try {
-    const response = await fetch("data.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error("Failed to load data.json");
-    }
-    const data = await response.json();
-    colleges = Array.isArray(data) ? data : [];
-    filteredColleges = [...colleges];
-  } catch (error) {
-    colleges = [];
-    filteredColleges = [];
-    elements.collegeGrid.innerHTML = "<p>Unable to load college data.</p>";
+const parseUniversityFromDescription = (description) => {
+  if (!description || typeof description !== "string") {
+    return "";
   }
+  const separatorIndex = description.indexOf(" - ");
+  return separatorIndex === -1 ? "" : description.slice(separatorIndex + 3).trim();
+};
+
+const normalizeCollege = (raw, index) => {
+  const id = raw.id ?? raw.college_id ?? `${raw.college_name || raw.title || "college"}-${index + 1}`;
+
+  return {
+    id: String(id),
+    college_name: raw.college_name || raw.title || "Unknown College",
+    course: raw.course || raw.course_name || "Unknown Course",
+    university:
+      raw.university ||
+      raw.affiliated_university ||
+      parseUniversityFromDescription(raw.description) ||
+      "Not specified",
+    approval: raw.approval || "Not specified",
+    specialisation:
+      raw.specialisation ||
+      raw.specialization ||
+      raw.specializations ||
+      raw.badge ||
+      "General",
+    location: raw.location || raw.city || "Karnataka",
+    fees: Number(raw.fees || raw.fees_max || raw.fees_min || 0),
+    ownership: raw.ownership || raw.type || "",
+    exam: raw.exam || raw.exam_required || "",
+    rating: Number(raw.rating || 0)
+  };
+};
+
+const getApiRows = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (payload && Array.isArray(payload.courses)) {
+    return payload.courses;
+  }
+  return [];
+};
+
+const uniqueValues = (values) => {
+  return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
+};
+
+const setSelectOptions = (selectElement, values, defaultLabel) => {
+  const previousValue = selectElement.value;
+  selectElement.innerHTML = "";
+  selectElement.add(new Option(defaultLabel, ""));
+  values.forEach((value) => selectElement.add(new Option(value, value)));
+  selectElement.value = values.includes(previousValue) ? previousValue : "";
+};
+
+const populateFilterOptions = () => {
+  const courses = uniqueValues(colleges.map((college) => college.course));
+  const specializations = uniqueValues(colleges.map((college) => college.specialisation));
+  const locations = uniqueValues(colleges.map((college) => college.location));
+  const exams = uniqueValues(colleges.map((college) => college.exam));
+
+  setSelectOptions(elements.heroCourse, courses, "All Streams");
+  setSelectOptions(elements.filterCourse, courses, "All Courses");
+  setSelectOptions(elements.filterSpecialization, specializations, "All Specializations");
+  setSelectOptions(elements.heroLocation, locations, "All Karnataka");
+  setSelectOptions(elements.filterLocation, locations, "All Karnataka");
+  setSelectOptions(elements.filterExam, exams, "Any Exam");
+};
+
+const loadCollegeData = async () => {
+  for (const endpoint of API_ENDPOINTS) {
+    try {
+      const response = await fetch(endpoint, { cache: "no-store" });
+      if (!response.ok) {
+        continue;
+      }
+
+      const payload = await response.json();
+      const rows = getApiRows(payload);
+      if (!rows.length) {
+        continue;
+      }
+
+      colleges = rows.map(normalizeCollege);
+      filteredColleges = [...colleges];
+      populateFilterOptions();
+      return;
+    } catch (error) {
+      console.error(`Failed to load ${endpoint}`, error);
+    }
+  }
+
+  colleges = [];
+  filteredColleges = [];
+  elements.collegeGrid.innerHTML = "<p>Unable to load college data from backend.</p>";
 };
 
 const showToast = (message) => {
@@ -126,22 +217,32 @@ const applyFilters = (resetCount = true) => {
   const specialization = elements.filterSpecialization.value;
   const location = elements.filterLocation.value;
   const feeCap = Number(elements.feeRange.value);
-  const ownership = getOwnershipFilters();
+  const ownership = getOwnershipFilters().map((value) => value.toLowerCase());
   const exam = elements.filterExam.value;
   const rating = Number(elements.filterRating.value || 0);
 
   filteredColleges = colleges.filter((college) => {
-    const matchesQuery = !query || [college.college_name, college.specialisation, college.course, college.university]
+    const matchesQuery = !query || [
+      college.college_name,
+      college.specialisation,
+      college.course,
+      college.university,
+      college.exam,
+      college.ownership
+    ]
       .join(" ")
       .toLowerCase()
       .includes(query);
     const matchesCourse = !course || college.course === course;
     const matchesSpec = !specialization || college.specialisation === specialization;
     const matchesLocation = !location || college.location === location;
-    const matchesFee = !feeCap || true;
-    const matchesOwnership = ownership.length === 0 || true;
-    const matchesExam = !exam || true;
-    const matchesRating = rating === 0 || true;
+    const fee = Number(college.fees || 0);
+    const matchesFee = fee === 0 || fee <= feeCap;
+    const ownershipValue = String(college.ownership || "").toLowerCase();
+    const matchesOwnership = ownership.length === 0 || ownership.some((item) => ownershipValue.includes(item));
+    const examValue = String(college.exam || "").toLowerCase();
+    const matchesExam = !exam || examValue.includes(exam.toLowerCase());
+    const matchesRating = rating === 0 || Number(college.rating || 0) >= rating;
 
     return (
       matchesQuery &&
@@ -164,6 +265,9 @@ const renderCollegeCards = () => {
     .map((college) => {
       const isSaved = state.saved.has(college.id);
       const isCompared = state.compare.includes(college.id);
+      const feeLabel = college.fees
+        ? `INR ${new Intl.NumberFormat("en-IN").format(college.fees)}`
+        : "Not available";
       return `
         <article class="college-card">
           <div class="card-top">
@@ -185,7 +289,11 @@ const renderCollegeCards = () => {
             <span>Approval: ${college.approval}</span>
           </div>
           <div class="card-meta">
-            <span>Course: ${college.course}</span>
+            <span>Fees: ${feeLabel}</span>
+            <span>Exam: ${college.exam || "Not specified"}</span>
+          </div>
+          <div class="card-meta">
+            <span>Ownership: ${college.ownership || "Not specified"}</span>
           </div>
           <div class="card-actions">
             <button class="icon-btn ${isCompared ? "active" : ""}" data-action="compare" data-id="${college.id}" aria-pressed="${isCompared}">
@@ -239,6 +347,10 @@ const renderCompareTable = () => {
     { label: "Location", values: selected.map((c) => c.location || "Karnataka") },
     { label: "Course", values: selected.map((c) => c.course) },
     { label: "Specialisation", values: selected.map((c) => c.specialisation || "General") },
+    {
+      label: "Fees (per year)",
+      values: selected.map((c) => (c.fees ? `INR ${new Intl.NumberFormat("en-IN").format(c.fees)}` : "Not available"))
+    },
     { label: "University", values: selected.map((c) => c.university) },
     { label: "Approval", values: selected.map((c) => c.approval) }
   ];
